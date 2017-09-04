@@ -6,7 +6,7 @@
  * Time: 12:52
  */
 session_start();
-$pdo = new PDO('mysql:host=localhost; dbname=test', 'root', 'root');
+require_once("config.php");
 
 if(isset($_GET['login'])) {
     $username = $_POST['username'];
