@@ -42,7 +42,7 @@ if(isset($_GET['register'])) {
 
     //Überprüfe, dass der Username noch nicht registriert wurde
     if(!$error) {
-        $statement = $pdo->prepare("SELECT * FROM users WHERE username = :username");
+        $statement = $pdo->prepare("SELECT * FROM user WHERE username = :username");
         $result = $statement->execute(array('username' => $username));
         $user = $statement->fetch();
 
@@ -56,7 +56,7 @@ if(isset($_GET['register'])) {
     if(!$error) {
         $passwort_hash = password_hash($passwort, PASSWORD_DEFAULT);
 
-        $statement = $pdo->prepare("INSERT INTO users (username, passwort) VALUES (:username, :passwort)");
+        $statement = $pdo->prepare("INSERT INTO user (username, passwort) VALUES (:username, :passwort)");
         $result = $statement->execute(array('username' => $username, 'passwort' => $passwort_hash));
 
         if($result) {

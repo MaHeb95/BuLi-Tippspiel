@@ -12,7 +12,7 @@ if(isset($_GET['login'])) {
     $username = $_POST['username'];
     $passwort = $_POST['passwort'];
 
-    $statement = $pdo->prepare("SELECT * FROM users WHERE username = :username");
+    $statement = $pdo->prepare("SELECT * FROM user WHERE username = :username");
     $result = $statement->execute(array('username' => $username));
     $user = $statement->fetch();
 
