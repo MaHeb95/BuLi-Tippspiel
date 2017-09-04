@@ -24,18 +24,18 @@ $showFormular = true; //Variable ob das Registrierungsformular anezeigt werden s
 if(isset($_GET['register'])) {
     $error = false;
     $username = $_POST['username'];
-    $passwort = $_POST['passwort'];
-    $passwort2 = $_POST['passwort2'];
+    $password = $_POST['password'];
+    $password2 = $_POST['password2'];
 
     if(empty($username)) {
         echo 'Bitte eine Username eingeben<br>';
         $error = true;
     }
-    if(strlen($passwort) == 0) {
+    if(strlen($password) == 0) {
         echo 'Bitte ein Passwort angeben<br>';
         $error = true;
     }
-    if($passwort != $passwort2) {
+    if($password != $password2) {
         echo 'Die Passwörter müssen übereinstimmen<br>';
         $error = true;
     }
@@ -54,10 +54,10 @@ if(isset($_GET['register'])) {
 
     //Keine Fehler, wir können den Nutzer registrieren
     if(!$error) {
-        $passwort_hash = password_hash($passwort, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $statement = $pdo->prepare("INSERT INTO user (username, passwort) VALUES (:username, :passwort)");
-        $result = $statement->execute(array('username' => $username, 'passwort' => $passwort_hash));
+        $statement = $pdo->prepare("INSERT INTO user (username, password) VALUES (:username, :password)");
+        $result = $statement->execute(array('username' => $username, 'password' => $password_hash));
 
         if($result) {
             echo 'Du wurdest erfolgreich registriert. <a href="login.php">Zum Login</a>';
@@ -76,10 +76,10 @@ if($showFormular) {
         <input type="username" size="40" maxlength="250" name="username"><br><br>
 
         Dein Passwort:<br>
-        <input type="password" size="40"  maxlength="250" name="passwort"><br>
+        <input type="password" size="40"  maxlength="250" name="password"><br>
 
         Passwort wiederholen:<br>
-        <input type="password" size="40" maxlength="250" name="passwort2"><br><br>
+        <input type="password" size="40" maxlength="250" name="password2"><br><br>
 
         <input type="submit" value="Abschicken">
     </form>

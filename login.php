@@ -10,14 +10,14 @@ require_once("config.php");
 
 if(isset($_GET['login'])) {
     $username = $_POST['username'];
-    $passwort = $_POST['passwort'];
+    $password = $_POST['password'];
 
     $statement = $pdo->prepare("SELECT * FROM user WHERE username = :username");
     $result = $statement->execute(array('username' => $username));
     $user = $statement->fetch();
 
     //Überprüfung des Passworts
-    if ($user !== false && password_verify($passwort, $user['passwort'])) {
+    if ($user !== false && password_verify($password, $user['password'])) {
         $_SESSION['userid'] = $user['id'];
         die('Login erfolgreich. Weiter zu <a href="start.php">internen Bereich</a>');
     } else {
@@ -44,7 +44,7 @@ if(isset($_GET['login'])) {
     <input type="username" size="40" maxlength="250" name="username"><br><br>
 
     Dein Passwort:<br>
-    <input type="password" size="40"  maxlength="250" name="passwort"><br>
+    <input type="password" size="40"  maxlength="250" name="password"><br>
 
     <input type="submit" value="Abschicken">
 </form>
