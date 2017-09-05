@@ -6,7 +6,65 @@
  * Time: 20:02
  */
 
-//require_once("config.php");
+function create_season($name, $start_time=NULL) {
+    require("config.php");
+
+    $statement = $pdo->prepare("INSERT INTO soccer_pool.season (name, start_time) VALUES (:name, FROM_UNIXTIME(:start_time))");
+    $statement->bindValue(':name', $name, PDO::PARAM_STR);
+    $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
+    $result = $statement->execute();
+
+    if($result) {
+        echo 'Das Saison wurde erfolgreich eingetragen.</br>';
+    } else {
+        echo 'Beim Abspeichern ist leider ein Fehler aufgetreten.<br>';
+    }
+}
+
+function get_season_ids() {
+    require("config.php");
+
+    $statement = $pdo->prepare("SELECT id FROM soccer_pool.season");
+    $statement->execute();
+
+    $id_list = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $season) {
+        $id_list[] = $season['id'];
+    }
+
+    return $id_list;
+}
+
+function create_matchday($season_id, $name, $start_time=NULL) {
+    require("config.php");
+
+    $statement = $pdo->prepare("INSERT INTO soccer_pool.matchday (season_id, name, start_time) VALUES (:season_id, :name, FROM_UNIXTIME(:start_time))");
+    $statement->bindValue(':season_id', $season_id, PDO::PARAM_INT);
+    $statement->bindValue(':name', $name, PDO::PARAM_STR);
+    $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
+    $result = $statement->execute();
+
+    if($result) {
+        echo 'Der Spieltag wurde erfolgreich eingetragen.</br>';
+    } else {
+        echo 'Beim Abspeichern ist leider ein Fehler aufgetreten.<br>';
+    }
+}
+
+function get_matchday_ids($season_id) {
+    require("config.php");
+
+    $statement = $pdo->prepare("SELECT id FROM soccer_pool.matchday WHERE season_id = :season_id");
+    $statement->bindValue(':season_id', $season_id, PDO::PARAM_INT);
+    $statement->execute();
+
+    $id_list = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $matchday) {
+        $id_list[] = $matchday['id'];
+    }
+
+    return $id_list;
+}
 
 function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL, $start_time=NULL) {
     require("config.php");
@@ -47,23 +105,18 @@ function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL
 
 function get_match_ids($matchday_id) {
     require("config.php");
-    $error = false;
 
     // check if matchday_id exists
-    if (!$error) {
-        $statement = $pdo->prepare("SELECT id FROM soccer_pool.match WHERE matchday_id = :matchday_id");
-        $statement->bindValue(':matchday_id', $matchday_id, PDO::PARAM_INT);
-        $statement->execute();
-        //$result = $statement->execute(array('matchday_id' => $matchday_id));
-        //$matches = $statement->fetch();
+    $statement = $pdo->prepare("SELECT id FROM soccer_pool.match WHERE matchday_id = :matchday_id");
+    $statement->bindValue(':matchday_id', $matchday_id, PDO::PARAM_INT);
+    $statement->execute();
 
-        $id_list = [];
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $match) {
-            $id_list[] = $match['id'];
-        }
-
-        return $id_list;
+    $id_list = [];
+    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $match) {
+        $id_list[] = $match['id'];
     }
+
+    return $id_list;
 }
 
 function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goals=NULL, $finished=NULL) {
@@ -71,33 +124,31 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
     $error = false;
 
     // get match information
-    if (!$error) {
-        $statement = $pdo->prepare("SELECT * FROM soccer_pool.match WHERE id = :id");
-        $result = $statement->execute(array('id' => $match_id));
-        $match = $statement->fetch();
+    $statement = $pdo->prepare("SELECT * FROM soccer_pool.match WHERE id = :id");
+    $statement->execute(array('id' => $match_id));
+    $match = $statement->fetch();
 
-        if ($match == false) {
-            echo 'Dieses Spiel existiert nicht.<br>';
-            $error = true;
+    if ($match == false) {
+        echo 'Dieses Spiel existiert nicht.<br>';
+        $error = true;
+    }
+
+    if ($match['url'] !== NULL) {
+        $match_info = parse_match_url($match['url']);
+
+        if ($home_goals === NULL) {
+            $home_goals = $match_info['home_goals'];
         }
-
-        if ($match['url'] !== NULL) {
-            $match_info = parse_match_url($match['url']);
-
-            if ($home_goals === NULL) {
-                $home_goals = $match_info['home_goals'];
-            }
-            if ($guest_goals === NULL) {
-                $guest_goals = $match_info['guest_goals'];
-            }
-            if ($start_time === NULL) {
-                $start_time = $match_info['start_time'];
-            }
+        if ($guest_goals === NULL) {
+            $guest_goals = $match_info['guest_goals'];
+        }
+        if ($start_time === NULL) {
+            $start_time = $match_info['start_time'];
+        }
+        if ($finished === NULL) {
+            $finished = $match_info['finished'];
             if ($finished === NULL) {
-                $finished = $match_info['finished'];
-                if ($finished === NULL) {
-                    $finished = $match['finished'];
-                }
+                $finished = $match['finished'];
             }
         }
     }
@@ -115,23 +166,18 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
     }
 
     if (!$error) {
-        if ($start_time !== NULL) {
-            $statement = $pdo->prepare("UPDATE soccer_pool.match SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
-            $result = $statement->execute(array('id' => $match_id, 'start_time' => $start_time));
-        }
-
-        $statement = $pdo->prepare("UPDATE soccer_pool.match SET home_goals=:home_goals, guest_goals=:guest_goals, finished=:finished, winner=:winner WHERE id=:id");
+        $statement = $pdo->prepare("UPDATE soccer_pool.match SET home_goals=:home_goals, guest_goals=:guest_goals, 
+            finished=:finished, winner=:winner, start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
         $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
-        $statement->bindValue(':home_goals', $home_goals, PDO::PARAM_STR);
-        $statement->bindValue(':guest_goals', $guest_goals, PDO::PARAM_STR);
+        $statement->bindValue(':home_goals', $home_goals, PDO::PARAM_INT);
+        $statement->bindValue(':guest_goals', $guest_goals, PDO::PARAM_INT);
         $statement->bindValue(':finished', $finished, PDO::PARAM_BOOL);
         $statement->bindValue(':winner', $winner, PDO::PARAM_INT);
+        $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
         $result = $statement->execute();
-        //$result = $statement->execute(array('id' => $match_id, 'home_goals' => $home_goals,
-        //    'guest_goals' => $guest_goals, 'finished' => $finished, 'winner' => $winner));
 
         if($result) {
-            echo 'Das Spiel wurde erfolgreich eingetragen.</br>';
+            echo 'Das Spiel wurde erfolgreich aktualisiert.</br>';
             echo $match['home_team'] . ' ' . $home_goals . '-' . $guest_goals . ' '. $match['guest_team'] . '</br>';
         } else {
             echo 'Beim Abspeichern ist leider ein Fehler aufgetreten.<br>';
@@ -196,12 +242,18 @@ function parse_soccer24($url) {
     return $return;
 }
 
+/**
+//create_season('test', strtotime('31.03.2017 15:00'));
+var_dump(get_season_ids());
+//create_matchday(3, 'Test');
+var_dump(get_matchday_ids(1));
+
 //create_match(1, 'http://www.flashscore.de/spiel/UowH4tyj');
 //create_match(1, 'http://www.flashscore.de/spiel/h0pxfpON');
 //create_match(1, 'http://www.flashscore.de/spiel/AiowtGBS');
 
 foreach (get_match_ids(1) as $id) {
     update_match($id);
-}
+}**/
 
 ?>
