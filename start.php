@@ -5,14 +5,16 @@
  * Date: 04.09.17
  * Time: 17:05
  */
-
-session_start();
-if(!isset($_SESSION['userid'])) {
-    die('Bitte zuerst <a href="login.php">einloggen</a>');
-}
+//Check Login
+require ("view.nologin.php");
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
+
+//Ausgabe des internen Startfensters
+require ("view.header.php");
+require ("view.navbar.php");
+
 
 echo "Hallo User: ".$userid;
 ?>

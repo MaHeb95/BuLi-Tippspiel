@@ -19,34 +19,41 @@ if(isset($_GET['login'])) {
     //Überprüfung des Passworts
     if ($user !== false && password_verify($password, $user['password'])) {
         $_SESSION['userid'] = $user['id'];
-        die('Login erfolgreich. Weiter zu <a href="start.php">internen Bereich</a>');
+        //die('Login erfolgreich. Weiter zu <a href="start.php">internen Bereich</a>');
+        header();
     } else {
         $errorMessage = "Username oder Passwort war ungültig<br>";
     }
 
 }
+require ("view.header.php");
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Login</title>
-    </head>
-<body>
 
 <?php
-    if(isset($errorMessage)) {
-        echo $errorMessage;
-    }
+if(isset($errorMessage)) {
+    echo $errorMessage;
+}
 ?>
+<html>
+<body>
+<link href="/css/signin.css" rel="stylesheet">
+<div class="container">
 
-<form action="?login=1" method="post">
-    Name:<br>
-    <input type="username" size="40" maxlength="250" name="username"><br><br>
+    <form class="form-signin" action="?login=1" method="post">
+        <h2 class="form-signin-heading">Bitte melde dich an</h2>
+        <label for="eingabefeldUsername" class="sr-only">Username</label>
+        <input type="text" id="eingabefeldUsername" class="form-control" placeholder="Username" required="" autofocus="" name="username">
+        <label for="eingabefeldPasswort" class="sr-only">Passwort</label>
+        <input type="password" id="eingabefeldPasswort" class="form-control" placeholder="Passwort" required="" name="password">
+        <div class="checkbox">
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" value="Abschicken">Anmelden</button>
+    </form>
 
-    Dein Passwort:<br>
-    <input type="password" size="40"  maxlength="250" name="password"><br>
+</div> <!-- /container -->
 
-    <input type="submit" value="Abschicken">
-</form>
+<!-- IE10-Anzeigefenster-Hack für Fehler auf Surface und Desktop-Windows-8 -->
+<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
 </body>
 </html>
