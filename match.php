@@ -114,8 +114,6 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
         $winner = NULL;
     }
 
-    var_dump($winner);
-
     if (!$error) {
         if ($start_time !== NULL) {
             $statement = $pdo->prepare("UPDATE soccer_pool.match SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
