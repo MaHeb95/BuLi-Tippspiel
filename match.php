@@ -114,6 +114,8 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
         $winner = NULL;
     }
 
+    var_dump($winner);
+
     if (!$error) {
         if ($start_time !== NULL) {
             $statement = $pdo->prepare("UPDATE soccer_pool.match SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
@@ -124,8 +126,8 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
         $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
         $statement->bindValue(':home_goals', $home_goals, PDO::PARAM_STR);
         $statement->bindValue(':guest_goals', $guest_goals, PDO::PARAM_STR);
-        $statement->bindValue(':finished', $finished, PDO::PARAM_INT);
-        $statement->bindValue(':winner', $winner, PDO::PARAM_BOOL);
+        $statement->bindValue(':finished', $finished, PDO::PARAM_BOOL);
+        $statement->bindValue(':winner', $winner, PDO::PARAM_INT);
         $result = $statement->execute();
         //$result = $statement->execute(array('id' => $match_id, 'home_goals' => $home_goals,
         //    'guest_goals' => $guest_goals, 'finished' => $finished, 'winner' => $winner));
@@ -196,9 +198,9 @@ function parse_soccer24($url) {
     return $return;
 }
 
-create_match(1, 'http://www.flashscore.de/spiel/UowH4tyj');
-create_match(1, 'http://www.flashscore.de/spiel/h0pxfpON');
-create_match(1, 'http://www.flashscore.de/spiel/AiowtGBS');
+//create_match(1, 'http://www.flashscore.de/spiel/UowH4tyj');
+//create_match(1, 'http://www.flashscore.de/spiel/h0pxfpON');
+//create_match(1, 'http://www.flashscore.de/spiel/AiowtGBS');
 
 foreach (get_match_ids(1) as $id) {
     update_match($id);
