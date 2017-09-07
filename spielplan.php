@@ -33,21 +33,12 @@ if (trim($_POST["inputurl"]) !== "") {
     var_dump(trim($_POST["inputurl"]));
 }
 
+$md_matches = null;
 if ($matchdaymenu !== null) {
     foreach (get_match_ids(1) as $id) {
         update_match($id);
     }
-}
-
-//when submit button is pressed then Season id and Matchday id are displayed to the user
-$md_matches = null;
-if (isset($_GET['submit'])) {
-    if (isset($_GET['matchday'])) {
-        $seasonmenu = $_GET['season'];
-    }
-    if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
-        $md_matches = get_matches(get_match_ids($matchdaymenu));
-    }
+    $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
 
 
@@ -125,7 +116,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         }
         ?>
                 <div class="col col-lg-2">
-                    <p><input class="btn btn-info" class="col align-self-end" name="submit" value="Submit" type="submit" /></p>
+                    <p><input class="btn btn-info" class="col align-self-end" value="Submit" type="submit" /></p>
                 </div>
             </div>
         </div>
