@@ -158,6 +158,12 @@ function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL
     return $result;
 }
 
+function delete_match($match_id) {
+    $statement = $pdo->prepare("DELETE FROM soccer_pool.match WHERE id=:id");
+    $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
+    return $statement->execute();
+}
+
 function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goals=NULL, $finished=NULL) {
     require("config.php");
 
