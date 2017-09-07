@@ -306,21 +306,23 @@ function parse_soccer24($url) {
 //var_dump(get_matchdays(get_matchday_ids(1)));
 //var_dump(get_matches(get_match_ids(1)));
 
-update_matchday_start_time(1);
-update_season_start_time(1);
+//update_matchday_start_time(1);
+//update_season_start_time(1);
 
 
 //create_season('test', strtotime('31.03.2017 15:00'));
-var_dump(get_season_ids());
+//var_dump(get_season_ids());
 //create_matchday(get_season_ids()[0], 'Test');
-var_dump(get_matchday_ids(1));
+//var_dump(get_matchday_ids(1));
 
 //create_match(1, 'http://www.flashscore.de/spiel/UowH4tyj');
 //create_match(1, 'http://www.flashscore.de/spiel/h0pxfpON');
 //create_match(1, 'http://www.flashscore.de/spiel/AiowtGBS');
 
-foreach (get_match_ids(1) as $id) {
-    update_match($id);
-}
+//foreach (get_match_ids(1) as $id) {
+//    update_match($id);
+//}
+
+//var_dump(get_matches(get_match_ids(1)));
 
 ?>

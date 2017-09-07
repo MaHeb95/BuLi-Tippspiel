@@ -9,7 +9,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="#">Spielplan</a>
+                <a class="nav-link" href="spielplan.php">Spielplan</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Tipps</a>

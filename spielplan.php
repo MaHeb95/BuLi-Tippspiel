@@ -19,9 +19,35 @@ require ("config.php");
 require ("match.php");
 
 
-$seasonmenu = $matchdaymenu = null;
+$seasonmenu = null;
+$matchdaymenu = null;
 if (isset($_GET["season"]) && is_numeric($_GET["season"])) {
     $seasonmenu = $_GET["season"];
+}
+if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
+    $matchdaymenu = $_GET['matchday'];
+}
+
+if (trim($_POST["inputurl"]) !== "") {
+    create_match($matchdaymenu, trim($_POST["inputurl"]));
+    var_dump(trim($_POST["inputurl"]));
+}
+
+if ($matchdaymenu !== null) {
+    foreach (get_match_ids(1) as $id) {
+        update_match($id);
+    }
+}
+
+//when submit button is pressed then Season id and Matchday id are displayed to the user
+$md_matches = null;
+if (isset($_GET['submit'])) {
+    if (isset($_GET['matchday'])) {
+        $seasonmenu = $_GET['season'];
+    }
+    if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
+        $md_matches = get_matches(get_match_ids($matchdaymenu));
+    }
 }
 
 
@@ -51,7 +77,7 @@ if (isset($_GET["season"]) && is_numeric($_GET["season"])) {
 $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 ?>
 
-<form class="form" id="form" name="form" method="post" action="<?php echo $actual_link; ?>">
+<form class="form" id="form" name="form" method="get" action="<?php echo $actual_link; ?>">
     <fieldset>
         <div class="container">
             <div class="row justify-content-md-center">
@@ -106,66 +132,52 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     </fieldset>
 </form>
 
-<?php
-//when submit button is pressed then Season id and Matchday id are displayed to the user
-if (isset($_POST['submit'])) {
-    if (isset($_POST['matchday'])) {
-        $seasonmenu = $_POST['season'];
-    }
-    if (isset($_POST['matchday']) && is_numeric($_POST['matchday'])) {
-        $matchdaymenu = $_POST['matchday'];
-    }
-    if (isset($_POST['matchday']) && is_numeric($_POST['matchday'])) {
-        echo 'Season Id: ' . $seasonmenu . ' -> ' . 'Matchday Id: ' . $matchdaymenu;
-    } else if (isset($_POST['matchday'])) {
-        echo 'Season Id: ' . $seasonmenu;
-    }
-}
-$md_matches = get_matches(get_match_ids($matchdaymenu));
-var_dump($md_matches);
-?>
 
+<?php
+if(count($md_matches) > 0){
+    ?>
 <table class="table">
     <thead class="thead-inverse">
     <tr>
-        <th>#</th>
         <th>Anstoss</th>
-        <th>Heim</th>
-        <th>Gast</th>
-        <th>Heimtore</th>
-        <th>Gasttore</th>
+        <th style="text-align: center" colspan="3">Ansetzung</th>
+        <th style="text-align: center">Ergebnis</th>
         <th>Action</th>
     </tr>
     </thead>
     <tbody>
 <?php
-if($md_matches->rowCount() > 0){
     foreach($md_matches AS $row) {
         echo "<tr>";
-        echo "<td>" . $row['id'] . "</td>";
-        echo "<td>" . $row['start_tim'] . "</td>";
-        echo "<td>" . $row['home_team'] . "</td>";
+        //echo "<td>" . $row['id'] . "</td>";
+        echo "<td>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
+        echo "<td align='right'>" . $row['home_team'] . "</td>";
+        echo "<td align='center'> - </td>";
         echo "<td>" . $row['guest_team'] . "</td>";
-        echo "<td>" . $row['home_goals'] . "</td>";
-        echo "<td>" . $row['guest_goals'] . "</td>";
+        echo "<td align='center'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "</td>";
         echo "<td></td>";
         echo "</tr>";
-        echo "</tbody>";
-        echo "</table>";
-    }}
-else {
+    }
+    echo "</tbody>";
+    echo "</table>";
+}
+elseif(count($md_matches) == 0 && $md_matches !== null) {
     echo "<p class='lead'><em>Keine Spiele gefunden.</em></p>";
 }?>
 
-<div class="container">
-    <form action="" method="post">
-        <label for="inputurl">Eingabe der Match URL</label>
-        <input type="text" class="form-control" id="inputurl" placeholder="URL" value="<?php echo $url; ?>">
-    <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
 <?php
-var_dump(trim($_POST['inputurl']));
+if ($md_matches !== null) {
+    ?>
+
+    <div class="container">
+        <form action="<?php echo $actual_link; ?>" method="post">
+            <label for="inputurl">Eingabe der Match URL</label>
+            <input type="text" class="form-control" name="inputurl" placeholder="URL" value="<?php echo $url; ?>">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <?php
+}
 //parse_match_url($url); ?>
 
 
