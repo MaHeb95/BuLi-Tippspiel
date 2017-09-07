@@ -15,11 +15,10 @@ function create_bet($user_id, $match_id, $bet) {
     $start_time = (int) $val;
 
     if ($start_time<0) {
-        return $result = False;
+        return False;
     }else {
 
         $statement = $pdo->prepare("SELECT * FROM soccer_pool.bet WHERE match_id='".$match_id."'");
-        $statement->bindParam(1, $_GET['match_id'], PDO::PARAM_INT);
         $statement->execute();
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if( ! $row)
@@ -46,7 +45,7 @@ function check_points($user_id, $match_id) {
     $val = $statement->fetch(PDO::FETCH_ASSOC)['finished'];
     $finished = (int) $val;
     if ($finished == 0) {
-        return $result = False;
+        return False;
     } else {
 
         $statement = $pdo->prepare("SELECT winner FROM soccer_pool.match  WHERE id ='".$match_id."'");
@@ -70,32 +69,33 @@ function check_points($user_id, $match_id) {
             $statement->bindValue(':points', $points, PDO::PARAM_INT);
             $result = $statement->execute();
         }
-
     }
-
     return $result;
 }
 
-function submitted_users_matchday($user_id, $matchday) {
-    require("config.php");
-
-    $statement = $pdo->prepare("SELECT id FROM soccer_pool.match  WHERE matchday_id ='".$matchday."'");
-    $statement->execute();
-    $val = $statement->fetchAll(PDO::FETCH_BOTH);
-    var_dump($val);
-    die();
-
+/*function submitted_matchday($user_id, $matchday) {
+    require ("config.php");
+    require ("match.php");
+    $val = get_match_ids($matchday);
     foreach ($val AS $match_id) {
-        $submitted = 1;
-        $statement = $pdo->prepare("UPDATE soccer_pool.bet SET submitted=:submitted WHERE match_id='".$match_id."' AND user_id='".$user_id."'");
-        $statement->bindValue(':submitted', $submitted, PDO::PARAM_INT);
-        $result = $statement->execute();
+        submitted($user_id, $match_id);
     }
+    return $result;
+}*/
+
+function submitted($user_id, $match_id) {
+    require ("config.php");
+
+    $submitted = 1;
+    $statement = $pdo->prepare("UPDATE soccer_pool.bet SET submitted=:submitted WHERE match_id='".$match_id."' AND user_id='".$user_id."'");
+    $statement->bindValue(':submitted', $submitted, PDO::PARAM_INT);
+    $result = $statement->execute();
+
     return $result;
 }
 
-//var_dump(create_bet(1,2,2));
+//var_dump(create_bet(1,2,1));
 //var_dump(check_points(1,1));
-var_dump(submitted_users_matchday(1,1));
+var_dump(submitted(1,1));
 ?>
 
