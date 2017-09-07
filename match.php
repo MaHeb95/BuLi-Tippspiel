@@ -10,7 +10,7 @@
 function create_season($name, $start_time=NULL) {
     require("config.php");
 
-    $statement = $pdo->prepare("INSERT INTO soccer_pool.season (name, start_time) VALUES (:name, FROM_UNIXTIME(:start_time))");
+    $statement = $pdo->prepare("INSERT INTO ".$db_name.".season (name, start_time) VALUES (:name, FROM_UNIXTIME(:start_time))");
     $statement->bindValue(':name', $name, PDO::PARAM_STR);
     $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
     $result = $statement->execute();
@@ -22,7 +22,7 @@ function update_season_start_time($season_id) {
     require("config.php");
 
     $statement = $pdo->prepare(
-        "SELECT start_time FROM soccer_pool.matchday 
+        "SELECT start_time FROM ".$db_name.".matchday 
          WHERE (season_id = :season_id AND start_time IS NOT NULL)
          ORDER BY start_time ASC
          LIMIT 1");
@@ -34,7 +34,7 @@ function update_season_start_time($season_id) {
         $start_time = strtotime($start_time);
     }
 
-    $statement = $pdo->prepare("UPDATE soccer_pool.season SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
+    $statement = $pdo->prepare("UPDATE ".$db_name.".season SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
     $statement->bindValue(':id', $season_id, PDO::PARAM_INT);
     $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
     $statement->execute();
@@ -43,7 +43,7 @@ function update_season_start_time($season_id) {
 function get_season_ids() {
     require("config.php");
 
-    $statement = $pdo->prepare("SELECT id FROM soccer_pool.season ORDER BY start_time ASC, name ASC");
+    $statement = $pdo->prepare("SELECT id FROM ".$db_name.".season ORDER BY start_time ASC, name ASC");
     $statement->execute();
 
     $id_list = [];
@@ -60,7 +60,7 @@ function get_seasons($ids) {
     $seasons = [];
 
     foreach ($ids as $id) {
-        $statement = $pdo->prepare("SELECT * FROM soccer_pool.season WHERE id = :id");
+        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".season WHERE id = :id");
         $statement->execute(array('id' => $id));
         $seasons[$id] = $statement->fetch(PDO::FETCH_ASSOC);
     }
@@ -71,7 +71,7 @@ function get_seasons($ids) {
 function create_matchday($season_id, $name, $start_time=NULL) {
     require("config.php");
 
-    $statement = $pdo->prepare("INSERT INTO soccer_pool.matchday (season_id, name, start_time) VALUES (:season_id, :name, FROM_UNIXTIME(:start_time))");
+    $statement = $pdo->prepare("INSERT INTO ".$db_name.".matchday (season_id, name, start_time) VALUES (:season_id, :name, FROM_UNIXTIME(:start_time))");
     $statement->bindValue(':season_id', $season_id, PDO::PARAM_INT);
     $statement->bindValue(':name', $name, PDO::PARAM_STR);
     $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
@@ -84,7 +84,7 @@ function update_matchday_start_time($matchday_id) {
     require("config.php");
 
     $statement = $pdo->prepare(
-        "SELECT start_time FROM soccer_pool.match 
+        "SELECT start_time FROM ".$db_name.".match 
          WHERE (matchday_id = :matchday_id AND start_time IS NOT NULL)
          ORDER BY start_time ASC
          LIMIT 1");
@@ -96,7 +96,7 @@ function update_matchday_start_time($matchday_id) {
         $start_time = strtotime($start_time);
     }
 
-    $statement = $pdo->prepare("UPDATE soccer_pool.matchday SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
+    $statement = $pdo->prepare("UPDATE ".$db_name.".matchday SET start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
     $statement->bindValue(':id', $matchday_id, PDO::PARAM_INT);
     $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
     $statement->execute();
@@ -105,7 +105,7 @@ function update_matchday_start_time($matchday_id) {
 function get_matchday_ids($season_id) {
     require("config.php");
 
-    $statement = $pdo->prepare("SELECT id FROM soccer_pool.matchday WHERE season_id = :season_id
+    $statement = $pdo->prepare("SELECT id FROM ".$db_name.".matchday WHERE season_id = :season_id
         ORDER BY start_time ASC, name ASC");
     $statement->bindValue(':season_id', $season_id, PDO::PARAM_INT);
     $statement->execute();
@@ -124,7 +124,7 @@ function get_matchdays($ids) {
     $matchdays = [];
 
     foreach ($ids as $id) {
-        $statement = $pdo->prepare("SELECT * FROM soccer_pool.matchday WHERE id = :id");
+        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".matchday WHERE id = :id");
         $statement->execute(array('id' => $id));
         $matchdays[$id] = $statement->fetch(PDO::FETCH_ASSOC);
     }
@@ -143,7 +143,7 @@ function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL
     }
 
     // check if matchday_id exists
-    $statement = $pdo->prepare("SELECT * FROM soccer_pool.matchday WHERE id = :id");
+    $statement = $pdo->prepare("SELECT * FROM ".$db_name.".matchday WHERE id = :id");
     $statement->execute(array('id' => $matchday_id));
     $matchday = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -152,14 +152,16 @@ function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL
     }
 
     // write information to database
-    $statement = $pdo->prepare("INSERT INTO soccer_pool.match (matchday_id, home_team, guest_team, start_time, url) VALUES (:matchday_id, :home_team, :guest_team, FROM_UNIXTIME(:start_time), :url)");
+    $statement = $pdo->prepare("INSERT INTO ".$db_name.".match (matchday_id, home_team, guest_team, start_time, url) VALUES (:matchday_id, :home_team, :guest_team, FROM_UNIXTIME(:start_time), :url)");
     $result = $statement->execute(array('matchday_id' => $matchday_id, 'home_team' => $home_team, 'guest_team' => $guest_team, 'start_time' => $start_time, 'url' => $url));
 
     return $result;
 }
 
 function delete_match($match_id) {
-    $statement = $pdo->prepare("DELETE FROM soccer_pool.match WHERE id=:id");
+    require("config.php");
+
+    $statement = $pdo->prepare("DELETE FROM ".$db_name.".match WHERE id=:id");
     $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
     return $statement->execute();
 }
@@ -168,7 +170,7 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
     require("config.php");
 
     // get match information
-    $statement = $pdo->prepare("SELECT * FROM soccer_pool.match WHERE id = :id");
+    $statement = $pdo->prepare("SELECT * FROM ".$db_name.".match WHERE id = :id");
     $statement->execute(array('id' => $match_id));
     $match = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -208,7 +210,7 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
         $winner = NULL;
     }
 
-    $statement = $pdo->prepare("UPDATE soccer_pool.match SET home_goals=:home_goals, guest_goals=:guest_goals, 
+    $statement = $pdo->prepare("UPDATE ".$db_name.".match SET home_goals=:home_goals, guest_goals=:guest_goals, 
         finished=:finished, winner=:winner, start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
     $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
     $statement->bindValue(':home_goals', $home_goals, PDO::PARAM_INT);
@@ -226,7 +228,7 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
 function get_match_ids($matchday_id) {
     require("config.php");
 
-    $statement = $pdo->prepare("SELECT id FROM soccer_pool.match WHERE matchday_id = :matchday_id
+    $statement = $pdo->prepare("SELECT id FROM ".$db_name.".match WHERE matchday_id = :matchday_id
          ORDER BY start_time ASC");
     $statement->bindValue(':matchday_id', $matchday_id, PDO::PARAM_INT);
     $statement->execute();
@@ -245,7 +247,7 @@ function get_matches($ids) {
     $matches = [];
 
     foreach ($ids as $id) {
-        $statement = $pdo->prepare("SELECT * FROM soccer_pool.match WHERE id = :id");
+        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".match WHERE id = :id");
         $statement->execute(array('id' => $id));
         $matches[$id] = $statement->fetch(PDO::FETCH_ASSOC);
     }
