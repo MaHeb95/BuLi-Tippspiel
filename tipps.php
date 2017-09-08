@@ -45,6 +45,7 @@ if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
 
+//enter bets in database if bets submitted
 
 ?>
 <html>
@@ -143,7 +144,8 @@ if(count($md_matches) > 0){
 
 $statement = ("SELECT submitted FROM ".$db_name.".bet ");*/
 //!!!!! check if submitted
-if (true) { ?>
+if (true) {?>
+<form action="<?php echo $actual_link; ?>" method="post">
 <table class="table"> // Tabelle fürs tippen!
     <thead class="thead-inverse">
     <tr>
@@ -155,7 +157,7 @@ if (true) { ?>
         $statement->execute();
         $user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
         //var_dump($user);
-        echo "<th style='text-align: center' colspan='7'>" . $user . "</th>";
+        echo "<th style='text-align: center'>" . $user . "</th>";
         ?>
 </tr>
 </thead>
@@ -167,32 +169,25 @@ foreach ($md_matches AS $row) {
     echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
     echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
     echo "<td style='text-align: center' colspan='1'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  I  <strong>" . $row['winner'] . "</strong></td>";
-    echo "<td style='text-align: center' colspan='3'></td>";
-
     echo "<td style='text-align: center' colspan='1'>" ?>
-
-        <form action="<?php echo $actual_link; ?>" method="post">
             <label for="inputbet"></label>
-            <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value="<?php echo $bet; ?>"
+            <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
                 <?php if ($row['start'] < 0) {echo "disabled";}?>>
             <datalist id="possibleBets">
                 <option value="0">
                 <option value="1">
                 <option value="2">
             </datalist>
-        </form>
-
         <?php //!!! bet INPUT
         "</td>";
-
-    echo "<td style='text-align: center' colspan='3'></td>";
     echo "</tr>";
 }
 echo "</tbody>";
 echo "</table>";
 echo "<div class='col-md-3 col-md-offset-9'>";
-echo "<button type='submit' class='btn btn-primary'>Tipps abgeben!</button>";
+echo "<button type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
 echo "</div>";
+echo "</form>";
 }
 else {
 ?>
