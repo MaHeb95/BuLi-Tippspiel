@@ -46,13 +46,12 @@ if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
 foreach ($md_matches AS $row) {
-    var_dump($_POST[$row['id']]);
+    $val = strval($_POST[$row['id']]);
+    if (trim($val) !== "") {
+        create_bet($userid, $row['id'],$val);
+        submitted_bet($userid, $row['id']);
+    }
 }
-
-/*if (trim($_POST[$row['id']]) !== "") {
-    create_bet($userid, $row['id'],$_POST[$row['id']]);
-}*/
-
 ?>
 <html>
 <head>
@@ -216,6 +215,7 @@ else {
         echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
         echo "<td style='text-align: center' colspan='1'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  I  <strong>" . $row['winner'] . "</strong></td>";
         $matchid = $row['id'];
+        var_dump($matchid);
 
         $statement = ("SELECT * FROM " . $db_name . ".user ");
         foreach ($pdo->query($statement) as $row) {
