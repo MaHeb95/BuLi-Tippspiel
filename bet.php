@@ -105,7 +105,7 @@ function check_points($user_id, $match_id) {
     return $result;
 }*/
 
-function submitted($user_id, $match_id) {
+function submitted_bet($user_id, $match_id) {
     require ("config.php");
 
     $submitted = 1;
@@ -129,6 +129,6 @@ function check_matchday_submitted($user_id, $matchday) {
 //var_dump(check_points(1,1));
 //var_dump(submitted(1,1));
 //var_dump(get_bet(1,1));
-var_dump(check_matchday_submitted(1,1));
+//var_dump(check_matchday_submitted(1,1));
 ?>
 

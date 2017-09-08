@@ -45,8 +45,13 @@ if ($matchdaymenu !== null) {
     }
     $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
+foreach ($md_matches AS $row) {
+    var_dump($_POST[$row['id']]);
+}
 
-//enter bets in database if bets submitted
+/*if (trim($_POST[$row['id']]) !== "") {
+    create_bet($userid, $row['id'],$_POST[$row['id']]);
+}*/
 
 ?>
 <html>
@@ -141,18 +146,14 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
 <?php
 if(count($md_matches) > 0){
-/*var_dump($md_matches);
 
-$statement = ("SELECT submitted FROM ".$db_name.".bet ");*/
-//!!!!! check if submitted
-if (false) {?>
+if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
 <form action="<?php echo $actual_link; ?>" method="post">
 <table class="table"> // Tabelle fürs tippen!
     <thead class="thead-inverse">
     <tr>
         <th style="text-align: center" colspan="1">Anstoss</th>
         <th style="text-align: center" colspan="3">Ansetzung</th>
-        <th style="text-align: center" colspan="1">Ergebnis</th>
         <?php
         $statement = $pdo->prepare("SELECT username FROM soccer_pool.user WHERE id =" . $userid);
         $statement->execute();
@@ -169,9 +170,8 @@ foreach ($md_matches AS $row) {
     //echo "<td>" . $row['id'] . "</td>";
     echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
     echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
-    echo "<td style='text-align: center' colspan='1'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  I  <strong>" . $row['winner'] . "</strong></td>";
     echo "<td style='text-align: center' colspan='1'>" ?>
-            <label for="inputbet"></label>
+            <label for="<?php echo $row['id']; ?>"></label>
             <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
                 <?php if ($row['start'] < 0) {echo "disabled";}?>>
             <datalist id="possibleBets">

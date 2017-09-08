@@ -154,7 +154,7 @@ if(count($md_matches) > 0){
     foreach($md_matches AS $row) {
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
-        echo "<td>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
+        echo "<td>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
         echo "<td align='right'>" . $row['home_team'] . "</td>";
         echo "<td align='center'> - </td>";
         echo "<td>" . $row['guest_team'] . "</td>";
