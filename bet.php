@@ -119,18 +119,9 @@ function submitted($user_id, $match_id) {
 function check_matchday_submitted($user_id, $matchday) {
     require ("config.php");
 
-    $statement = $pdo->prepare("SELECT `bet`.submitted FROM bet, `match` WHERE `match`.id = bet.match_id AND `match`.matchday_id=3 AND user_id =1 ORDER BY `bet`.submitted DESC LIMIT 1;");
+    $statement = $pdo->prepare("SELECT `bet`.submitted FROM bet, `match` WHERE `match`.id = bet.match_id AND `match`.matchday_id= '".$matchday."'  AND user_id ='".$user_id."' ORDER BY `bet`.submitted DESC LIMIT 1;");
     $statement->execute();
-    $val = $statement->fetch(PDO::FETCH_ASSOC)['submitted'];
-    $submitted = (int) $val;
-
-    if ($submitted == 1) {
-        return false;
-    } elseif ($submitted == 0) {
-        return true;
-    } else {
-        return 'NULL';
-    }
+    return (bool) ($statement->fetch(PDO::FETCH_ASSOC)['submitted']);
 
 }
 
