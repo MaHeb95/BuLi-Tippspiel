@@ -15,6 +15,7 @@ $userid = $_SESSION['userid'];
 //Ausgabe des internen Startfensters
 require ("view.header.php");
 require ("view.navbar.php");
+
 require ("config.php");
 require ("match.php");
 
@@ -92,27 +93,24 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                 <div class="col col-lg-3">
                     <p class="bg">
                         <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
-                            <!--onChange event fired and function autoSubmit() is invoked-->
-                            <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
-                            <option value="">-- Wähle eine Saison --</option>
-                            <?php
-                            //select Season. Seasons are with parent_id=0
-                            $sql = "select id,name from soccer_pool.season ";
-                            $result = dbQuery($sql);
-                            while ($row = dbFetchAssoc($result)) {
-                                echo ("<option value=\"{$row['id']}\" " . ($seasonmenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
-                            }
-                            ?>
+                        <!--onChange event fired and function autoSubmit() is invoked-->
+                        <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
+                        <option value="">-- Wähle eine Saison --</option>
+                        <?php
+                        $seasons = get_seasons(get_season_ids());
+                        foreach ($seasons as $row) {
+                            echo ("<option value=\"{$row['id']}\" " . ($seasonmenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
+                        }
+                        ?>
                         </select>
                     </p>
                 </div>
                 <?php
                 //check whether Season was really selected and Season id is numeric
                 if ($seasonmenu != '' && is_numeric($seasonmenu)) {
-                    ////select sub-categories categories for a given Season id
-                    $sql = "select id,name from soccer_pool.matchday where season_id=" . $seasonmenu;
-                    $result = dbQuery($sql);
-                    if (dbNumRows($result) > 0) {
+                    //select sub-categories categories for a given Season id
+                    $matchdays = get_matchdays(get_matchday_ids($seasonmenu));
+                    if (count($matchdays) > 0) {
                         ?>
                 <div class="col col-lg-3">
                     <p class="bg">
@@ -121,7 +119,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                             <option value="">-- Wähle einen Spieltag --</option>
                             <?php
                             //POPULATE DROP DOWN WITH Matchday FROM A GIVEN Season
-                            while ($row = dbFetchAssoc($result)) {
+                            foreach ($matchdays as $row) {
                                 echo ("<option value=\"{$row['id']}\" " . ($matchdaymenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
                             }
                             ?>
@@ -132,9 +130,6 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
             }
         }
         ?>
-                <!--<div class="col col-lg-2">
-                    <p><input class="btn btn-info" class="col align-self-end" value="Submit" type="submit" /></p>
-                </div>-->
             </div>
         </div>
     </fieldset>
