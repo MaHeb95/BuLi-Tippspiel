@@ -221,7 +221,9 @@ else {
             if ($bet === NULL){
                 echo "<td style='text-align: center'>-</td>";
             } else {
-                if ($bet == $match['winner']) {
+                if ($match['winner'] === NULL) {
+                    echo "<td style='text-align: center'>" . $bet . "</td>";
+                } elseif ($bet == $match['winner']) {
                     echo "<td style='text-align: center'><strong>" . $bet . " ✓</strong></td>";
                 } else {
                     echo "<td style='text-align: center'>" . $bet . " ✗</td>";
