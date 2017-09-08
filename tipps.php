@@ -40,19 +40,18 @@ if ($matchdaymenu !== null) {
         }
     }
     $md_matches = get_matches(get_match_ids($matchdaymenu));
-
-    foreach ($md_matches AS $row) {
-        $val = strval($_POST[$row['id']]);
-        if (trim($val) !== "") {
-            create_bet($userid, $row['id'],$val);
-            submitted_bet($userid, $row['id']);
-        }
+}
+foreach ($md_matches AS $row) {
+    $val = strval($_POST[$row['id']]);
+    if (trim($val) !== "") {
+        create_bet($userid, $row['id'],$val);
+        submitted_bet($userid, $row['id']);
     }
+}
 
-    foreach (all_users() AS $user) {
-        foreach ($md_matches AS $match) {
-                check_points($user['id'],$match['id']);
-        }
+foreach (all_users() AS $user) {
+    foreach ($md_matches AS $match) {
+            check_points($user['id'],$match['id']);
     }
 }
 
@@ -149,7 +148,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
 
 <?php
-if (count($md_matches) > 0) {
+if(count($md_matches) > 0){
 
 if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
 <form action="<?php echo $actual_link; ?>" method="post">
@@ -159,7 +158,7 @@ if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
         <th style="text-align: center" colspan="1">Anstoss</th>
         <th style="text-align: center" colspan="3">Ansetzung</th>
         <?php
-        $statement = $pdo->prepare("SELECT username FROM ".$db_name.".user WHERE id =" . $userid);
+        $statement = $pdo->prepare("SELECT username FROM " . $db_name . ".user WHERE id =" . $userid);
         $statement->execute();
         $user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
         //var_dump($user);
