@@ -261,7 +261,6 @@ else {
 
     // sort user ID's and total points by points descending
     array_multisort($total_points,SORT_DESC, $user_ids);
-
     // calculate the ranking
     $ranks = [];
     $last_score = null;
@@ -279,8 +278,8 @@ else {
     echo "<tr class='active' >";
     echo "<td style='text-align: end' colspan='5'>Platz:</td>";
 
-    foreach ($user_ids as $id) {
-        echo "<td style='text-align: center'><strong>" . $ranks[$id] . "</strong></td>";
+    foreach (all_users() as $user) {
+        echo "<td style='text-align: center'><strong>" . $ranks[$user['id']] . "</strong></td>";
     }
     echo "</tr>";
 
