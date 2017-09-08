@@ -247,7 +247,7 @@ function get_matches($ids) {
     $matches = [];
 
     foreach ($ids as $id) {
-        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".match WHERE id = :id");
+        $statement = $pdo->prepare("SELECT *, start_time - NOW() AS start FROM ".$db_name.".match WHERE id = :id");
         $statement->execute(array('id' => $id));
         $matches[$id] = $statement->fetch(PDO::FETCH_ASSOC);
     }
