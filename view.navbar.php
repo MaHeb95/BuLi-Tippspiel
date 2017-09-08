@@ -12,7 +12,7 @@
                 <a class="nav-link" href="spielplan.php">Spielplan</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Tipps</a>
+                <a class="nav-link" href="tipps.php">Tipps</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Rangliste</a>

@@ -15,6 +15,7 @@ $userid = $_SESSION['userid'];
 //Ausgabe des internen Startfensters
 require ("view.header.php");
 require ("view.navbar.php");
+
 require ("config.php");
 require ("match.php");
 
@@ -28,35 +29,58 @@ if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
     $matchdaymenu = $_GET['matchday'];
 }
 
+if (trim($_POST["inputurl"]) !== "") {
+    create_match($matchdaymenu, trim($_POST["inputurl"]));
+}
+
 $md_matches = null;
 if ($matchdaymenu !== null) {
+    $md_matches = get_matches(get_match_ids($matchdaymenu));
     foreach (get_match_ids(1) as $id) {
-        update_match($id);
+        $match = $md_matches[$id];
+        if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
+            update_match($id);
+        }
     }
     $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
 
 
 ?>
-
-<script type="text/javascript">
-    /**
-     * You can have a look at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with * for more information on with() function.
-     */
-    function autoSubmit()
-    {
-        with (window.document.form) {
-            /**
-             * We have if and else block where we check the selected index for Seasonegory(season) and * accordingly we change the URL in the browser.
-             */
-            if (season.selectedIndex === 0) {
-                window.location.href = 'tipps.php';
-            } else {
-                window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value;
+<html>
+<head>
+    <script type="text/javascript">
+        /**
+         * You can have a look at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with * for more information on with() function.
+         */
+        function autoSubmit_season()
+        {
+            with (window.document.form) {
+                /**
+                 * We have if and else block where we check the selected index for Seasonegory(season) and * accordingly we change the URL in the browser.
+                 */
+                if (season.selectedIndex === 0) {
+                    window.location.href = 'tipps.php';
+                } else {
+                    window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value;
+                }
             }
         }
-    }
-</script>
+
+        function autoSubmit_matchday()
+        {
+            with (window.document.form) {
+                /**
+                 * We have if and else block where we check the selected index for Seasonegory(season) and * accordingly we change the URL in the browser.
+                 */
+                if (matchday.selectedIndex === 0) {
+                    window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value;
+                } else {
+                    window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value + '&matchday=' + matchday.options[matchday.selectedIndex].value;
+                }
+            }
+        }
+    </script>
 </head>
 <body>
 <?php
@@ -71,13 +95,11 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                     <p class="bg">
                         <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
                         <!--onChange event fired and function autoSubmit() is invoked-->
-                        <select class="form-control" id="season" name="season" onchange="autoSubmit();">
+                        <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
                             <option value="">-- Wähle eine Saison --</option>
                             <?php
-                            //select Season. Seasons are with parent_id=0
-                            $sql = "select id,name from ".$db_name.".season ";
-                            $result = dbQuery($sql);
-                            while ($row = dbFetchAssoc($result)) {
+                            $seasons = get_seasons(get_season_ids());
+                            foreach ($seasons as $row) {
                                 echo ("<option value=\"{$row['id']}\" " . ($seasonmenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
                             }
                             ?>
@@ -87,20 +109,19 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                 <?php
                 //check whether Season was really selected and Season id is numeric
                 if ($seasonmenu != '' && is_numeric($seasonmenu)) {
-                    ////select sub-categories categories for a given Season id
-                    $sql = "select id,name from ".$db_name.".matchday where season_id=" . $seasonmenu;
-                    $result = dbQuery($sql);
-                    if (dbNumRows($result) > 0) {
+                    //select sub-categories categories for a given Season id
+                    $matchdays = get_matchdays(get_matchday_ids($seasonmenu));
+                    if (count($matchdays) > 0) {
                         ?>
                         <div class="col col-lg-3">
                             <p class="bg">
                                 <label for="matchday">Wähle einen Spieltag</label>
-                                <select class="form-control" id="matchday" name="matchday">
+                                <select class="form-control" id="matchday" name="matchday" onchange="autoSubmit_matchday();">
                                     <option value="">-- Wähle einen Spieltag --</option>
                                     <?php
                                     //POPULATE DROP DOWN WITH Matchday FROM A GIVEN Season
-                                    while ($row = dbFetchAssoc($result)) {
-                                        echo ("<option value=\"{$row['id']}\" " . ($matchdaymenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
+                                    foreach ($matchdays as $row) {
+                                        echo ("<option value=\"{$row['id']}\" " . ($matchdaymenu == $row['id'] ? "selected" : "") . ">{$row['name']}</option>");
                                     }
                                     ?>
                                 </select>
@@ -110,9 +131,6 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                     }
                 }
                 ?>
-                <div class="col col-lg-2">
-                    <p><input class="btn btn-info" class="col align-self-end" value="Submit" type="submit" /></p>
-                </div>
             </div>
         </div>
     </fieldset>
