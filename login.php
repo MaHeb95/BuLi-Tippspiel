@@ -19,7 +19,8 @@ if(isset($_GET['login'])) {
     //Überprüfung des Passworts
     if ($user !== false && password_verify($password, $user['password'])) {
         $_SESSION['userid'] = $user['id'];
-        die('Login erfolgreich. Weiter zu <a href="start.php">internen Bereich</a>');
+        header("Location: start.php");
+        exit();
         //header();
     } else {
         $errorMessage = "Username oder Passwort war ungültig<br>";

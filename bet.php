@@ -121,10 +121,33 @@ function check_matchday_submitted($user_id, $matchday) {
 
 }
 
+function sum_points_matchday($user_id, $matchday) {
+    require ("config.php");
+
+    $statement = $pdo->prepare("SELECT sum(`bet`.points) FROM bet, `match` WHERE `match`.id = bet.match_id AND `match`.matchday_id= '".$matchday."'  AND user_id ='".$user_id."'");
+    $statement->execute();
+    $val = $statement->fetch(PDO::FETCH_ASSOC)['sum(`bet`.points)'];
+    $points = (int) $val;
+
+    return $points;
+}
+
+function sum_points_all($user_id) {
+    require ("config.php");
+
+    $statement = $pdo->prepare("SELECT sum(points) FROM ".$db_name.".bet WHERE user_id=" . $user_id);
+    $statement->execute();
+    $val = $statement->fetch(PDO::FETCH_ASSOC)['sum(points)'];
+    $points = (int) $val;
+
+    return $points;
+}
+
 //var_dump(create_bet(1,2,1));
 //var_dump(check_points(1,1));
 //var_dump(submitted(1,1));
 //var_dump(get_bet(1,1));
 //var_dump(check_matchday_submitted(1,1));
+//var_dump(sum_points_matchday(1,1));
 ?>
 

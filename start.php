@@ -14,7 +14,11 @@ $userid = $_SESSION['userid'];
 //Ausgabe des internen Startfensters
 require ("view.header.php");
 require ("view.navbar.php");
+require ("config.php");
 
+$statement = $pdo->prepare("SELECT username FROM soccer_pool.user WHERE id =" . $userid);
+$statement->execute();
+$user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
 
-echo "Hallo User: ".$userid;
+echo "Hallo ".$user."! Dein Login war erfolgreich!";
 ?>

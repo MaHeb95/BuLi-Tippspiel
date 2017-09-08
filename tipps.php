@@ -148,7 +148,7 @@ if(count($md_matches) > 0){
 
 if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
 <form action="<?php echo $actual_link; ?>" method="post">
-<table class="table"> // Tabelle fürs tippen!
+<table class="table">
     <thead class="thead-inverse">
     <tr>
         <th style="text-align: center" colspan="1">Anstoss</th>
@@ -192,7 +192,7 @@ echo "</form>";
 else {
 ?>
 
-<table class="table"> // Tabelle zur Übersicht
+<table class="table">
     <thead class="thead-inverse">
     <tr>
         <th style="text-align: center" colspan="1">Anstoss</th>
@@ -226,13 +226,29 @@ else {
                 } elseif ($bet == $match['winner']) {
                     echo "<td style='text-align: center'><strong>" . $bet . " ✓</strong></td>";
                 } else {
-                    echo "<td style='text-align: center'>" . $bet . " ✗</td>";
+                    echo "<td style='text-align: center'>" . $bet . "</td>";
                 }
             }
 
         }
         echo "</tr>";
     }
+    echo "<tr class='active' >";
+    echo "<td style='text-align: end' colspan='5'>Punkte Spieltag:</td>";
+        $statement = ("SELECT * FROM " . $db_name . ".user ");
+        foreach ($pdo->query($statement) as $user) {
+            echo "<td style='text-align: center'><strong>" . sum_points_matchday($user['id'],$matchdaymenu) . "</strong></td>";
+        }
+    echo "</tr>";
+
+    echo "<tr class='active' >";
+    echo "<td style='text-align: end' colspan='5'>Punkte Gesamt:</td>";
+    $statement = ("SELECT * FROM " . $db_name . ".user ");
+    foreach ($pdo->query($statement) as $user) {
+        echo "<td style='text-align: center'><strong>" . sum_points_all($user['id']) . "</strong></td>";
+    }
+    echo "</tr>";
+
     echo "</tbody>";
     echo "</table>";
 }
