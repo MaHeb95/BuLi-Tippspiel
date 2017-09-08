@@ -36,7 +36,7 @@ if (trim($_POST["inputurl"]) !== "") {
 $md_matches = null;
 if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
-    foreach (get_match_ids(1) as $id) {
+    foreach (get_match_ids($matchdaymenu) as $id) {
         $match = $md_matches[$id];
         if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
             update_match($id);

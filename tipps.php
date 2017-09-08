@@ -30,14 +30,10 @@ if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
     $matchdaymenu = $_GET['matchday'];
 }
 
-if (trim($_POST["inputurl"]) !== "") {
-    create_match($matchdaymenu, trim($_POST["inputurl"]));
-}
-
 $md_matches = null;
 if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
-    foreach (get_match_ids(1) as $id) {
+    foreach (get_match_ids($matchdaymenu) as $id) {
         $match = $md_matches[$id];
         if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
             update_match($id);
@@ -167,7 +163,7 @@ if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
 foreach ($md_matches AS $row) {
     echo "<tr>";
     //echo "<td>" . $row['id'] . "</td>";
-    echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
+    echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
     echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
     echo "<td style='text-align: center' colspan='1'>" ?>
             <label for="<?php echo $row['id']; ?>"></label>
@@ -200,7 +196,7 @@ else {
         <th style="text-align: center" colspan="1">Ergebnis</th>
         <?php
         $statement = ("SELECT * FROM " . $db_name . ".user ");
-        foreach ($pdo->query($statement) as $row) {
+        foreach (all_users() as $row) {
             echo "<th style='text-align: center' colspan='1'>" . $row['username'] . "</th>";
         }
         ?>
@@ -211,7 +207,7 @@ else {
     foreach ($md_matches AS $match) {
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
-        echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($match['start_time'])) . "</td>";
+        echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($match['start_time'])) . "</td>";
         echo "<td style='text-align: center' colspan='3'>" . $match['home_team'] . " - " . $match['guest_team'] . "</td>";
         echo "<td style='text-align: center' colspan='1'>" . $match['home_goals'] . " - " . $match['guest_goals'] . "  I  <strong>" . $match['winner'] . "</strong></td>";
 

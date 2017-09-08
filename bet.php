@@ -18,7 +18,7 @@ function create_bet($user_id, $match_id, $bet) {
         return False;
     }else {
 
-        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".bet WHERE match_id='".$match_id."'");
+        $statement = $pdo->prepare("SELECT * FROM ".$db_name.".bet WHERE match_id='".$match_id."' AND user_id=".$user_id);
         $statement->execute();
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         if( ! $row)
@@ -75,6 +75,10 @@ function check_points($user_id, $match_id) {
         $statement->execute();
         $val = $statement->fetch(PDO::FETCH_ASSOC)['bet'];
         $bet = (int) $val;
+
+        if ($val == null) {
+            return false;
+        }
 
         if ($winner == $bet) {
             $points = 1;
@@ -143,11 +147,23 @@ function sum_points_all($user_id) {
     return $points;
 }
 
+function all_users() {
+    require ("config.php");
+
+    $statement = $pdo->prepare("SELECT * FROM " . $db_name . ".user ");
+    $statement->execute();
+    $user = $statement->fetchAll();
+
+
+    return $user;
+}
+
 //var_dump(create_bet(1,2,1));
 //var_dump(check_points(1,1));
 //var_dump(submitted(1,1));
 //var_dump(get_bet(1,1));
 //var_dump(check_matchday_submitted(1,1));
 //var_dump(sum_points_matchday(1,1));
+//var_dump(all_users());
 ?>
 
