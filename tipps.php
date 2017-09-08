@@ -277,7 +277,7 @@ else {
 
     // output the ranking
     echo "<tr class='active' >";
-    echo "<td style='text-align: end' colspan='4'>Platz:</td>";
+    echo "<td style='text-align: end' colspan='5'>Platz:</td>";
 
     foreach ($user_ids as $id) {
         echo "<td style='text-align: center'><strong>" . $ranks[$id] . "</strong></td>";
