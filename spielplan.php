@@ -30,13 +30,16 @@ if (isset($_GET['matchday']) && is_numeric($_GET['matchday'])) {
 
 if (trim($_POST["inputurl"]) !== "") {
     create_match($matchdaymenu, trim($_POST["inputurl"]));
-    var_dump(trim($_POST["inputurl"]));
 }
 
 $md_matches = null;
 if ($matchdaymenu !== null) {
+    $md_matches = get_matches(get_match_ids($matchdaymenu));
     foreach (get_match_ids(1) as $id) {
-        update_match($id);
+        $match = $md_matches[$id];
+        if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
+            update_match($id);
+        }
     }
     $md_matches = get_matches(get_match_ids($matchdaymenu));
 }
@@ -48,7 +51,7 @@ if ($matchdaymenu !== null) {
         /**
          * You can have a look at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with * for more information on with() function.
          */
-        function autoSubmit()
+        function autoSubmit_season()
         {
             with (window.document.form) {
                 /**
@@ -58,6 +61,20 @@ if ($matchdaymenu !== null) {
                     window.location.href = 'spielplan.php';
                 } else {
                     window.location.href = 'spielplan.php?season=' + season.options[season.selectedIndex].value;
+                }
+            }
+        }
+
+        function autoSubmit_matchday()
+        {
+            with (window.document.form) {
+                /**
+                 * We have if and else block where we check the selected index for Seasonegory(season) and * accordingly we change the URL in the browser.
+                 */
+                if (matchday.selectedIndex === 0) {
+                    window.location.href = 'spielplan.php?season=' + season.options[season.selectedIndex].value;
+                } else {
+                    window.location.href = 'spielplan.php?season=' + season.options[season.selectedIndex].value + '&matchday=' + matchday.options[matchday.selectedIndex].value;
                 }
             }
         }
@@ -76,7 +93,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                     <p class="bg">
                         <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
                             <!--onChange event fired and function autoSubmit() is invoked-->
-                            <select class="form-control" id="season" name="season" onchange="autoSubmit();">
+                            <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
                             <option value="">-- Wähle eine Saison --</option>
                             <?php
                             //select Season. Seasons are with parent_id=0
@@ -100,7 +117,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                 <div class="col col-lg-3">
                     <p class="bg">
                         <label for="matchday">Wähle einen Spieltag</label>
-                        <select class="form-control" id="matchday" name="matchday">
+                        <select class="form-control" id="matchday" name="matchday" onchange="autoSubmit_matchday();">
                             <option value="">-- Wähle einen Spieltag --</option>
                             <?php
                             //POPULATE DROP DOWN WITH Matchday FROM A GIVEN Season
@@ -115,9 +132,9 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
             }
         }
         ?>
-                <div class="col col-lg-2">
+                <!--<div class="col col-lg-2">
                     <p><input class="btn btn-info" class="col align-self-end" value="Submit" type="submit" /></p>
-                </div>
+                </div>-->
             </div>
         </div>
     </fieldset>
@@ -133,7 +150,7 @@ if(count($md_matches) > 0){
         <th>Anstoss</th>
         <th style="text-align: center" colspan="3">Ansetzung</th>
         <th style="text-align: center">Ergebnis</th>
-        <th>Action</th>
+        <!--<th>Action</th>-->
     </tr>
     </thead>
     <tbody>
@@ -146,7 +163,7 @@ if(count($md_matches) > 0){
         echo "<td align='center'> - </td>";
         echo "<td>" . $row['guest_team'] . "</td>";
         echo "<td align='center'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "</td>";
-        echo "<td></td>";
+        //echo "<td></td>";
         echo "</tr>";
     }
     echo "</tbody>";
@@ -169,7 +186,7 @@ if ($md_matches !== null) {
     </div>
     <?php
 }
-//parse_match_url($url); ?>
+?>
 
 
 </body>
