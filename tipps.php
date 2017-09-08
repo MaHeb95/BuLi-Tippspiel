@@ -48,6 +48,14 @@ foreach ($md_matches AS $row) {
         submitted_bet($userid, $row['id']);
     }
 }
+
+foreach (all_users() AS $user) {
+    foreach ($md_matches AS $match) {
+            check_points($user['id'],$match['id']);
+    }
+}
+
+
 ?>
 <html>
 <head>
@@ -269,7 +277,7 @@ else {
 
     // output the ranking
     echo "<tr class='active' >";
-    echo "<td style='text-align: end' colspan='5'>Platz:</td>";
+    echo "<td style='text-align: end' colspan='4'>Platz:</td>";
 
     foreach ($user_ids as $id) {
         echo "<td style='text-align: center'><strong>" . $ranks[$id] . "</strong></td>";
