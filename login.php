@@ -19,7 +19,7 @@ if(isset($_GET['login'])) {
     //Überprüfung des Passworts
     if ($user !== false && password_verify($password, $user['password'])) {
         $_SESSION['userid'] = $user['id'];
-        header("Location: start.php");
+        header("Location: spielplan.php");
         exit();
         //header();
     } else {
