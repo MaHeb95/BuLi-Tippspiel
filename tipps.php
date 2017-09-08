@@ -158,7 +158,7 @@ if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
         <th style="text-align: center" colspan="1">Anstoss</th>
         <th style="text-align: center" colspan="3">Ansetzung</th>
         <?php
-        $statement = $pdo->prepare("SELECT username FROM soccer_pool.user WHERE id =" . $userid);
+        $statement = $pdo->prepare("SELECT username FROM ".$db_name.".user WHERE id =" . $userid);
         $statement->execute();
         $user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
         //var_dump($user);
