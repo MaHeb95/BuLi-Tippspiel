@@ -42,20 +42,16 @@ function get_bet($user_id, $match_id) {
 
     $statement = $pdo->prepare("SELECT submitted FROM ".$db_name.".bet WHERE match_id='".$match_id."' AND user_id=". $user_id);
     $statement->execute();
-    $val = $statement->fetch(PDO::FETCH_ASSOC)['submitted'];
-    $submitted = (int) $val;
-    if ($submitted == 0) {
+    $submitted = (bool) ($statement->fetch(PDO::FETCH_ASSOC)['submitted']);
 
-        return false;
-
-    }else {
-
+    if ($submitted) {
         $statement = $pdo->prepare("SELECT bet FROM " . $db_name . ".bet WHERE match_id ='" . $match_id . "' AND user_id ='" . $user_id . "'");
         $statement->execute();
-        $val = $statement->fetch(PDO::FETCH_ASSOC['bet']);
-        $bet = (int)$val;
+        $bet = (int) ($statement->fetch(PDO::FETCH_ASSOC)['bet']);
 
         return $bet;
+    } else {
+        return NULL;
     }
 }
 

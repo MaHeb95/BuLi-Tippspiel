@@ -208,22 +208,24 @@ else {
     </thead>
     <tbody>
     <?php
-    foreach ($md_matches AS $row) {
+    foreach ($md_matches AS $match) {
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
-        echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
-        echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
-        echo "<td style='text-align: center' colspan='1'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  I  <strong>" . $row['winner'] . "</strong></td>";
-        $matchid = $row['id'];
-        var_dump($matchid);
+        echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($match['start_time'])) . "</td>";
+        echo "<td style='text-align: center' colspan='3'>" . $match['home_team'] . " - " . $match['guest_team'] . "</td>";
+        echo "<td style='text-align: center' colspan='1'>" . $match['home_goals'] . " - " . $match['guest_goals'] . "  I  <strong>" . $match['winner'] . "</strong></td>";
 
         $statement = ("SELECT * FROM " . $db_name . ".user ");
-        foreach ($pdo->query($statement) as $row) {
-            if (get_bet($row['id'],$matchid) == false){
-                echo "<th style='text-align: center' colspan='1'>-</th>";
+        foreach ($pdo->query($statement) as $user) {
+            $bet = get_bet($user['id'],$match['id']);
+            if ($bet === NULL){
+                echo "<td style='text-align: center'>-</td>";
             } else {
-
-                echo "<th style='text-align: center' colspan='1'>" . get_bet($row['id'],$matchid) . "</th>";
+                if ($bet == $match['winner']) {
+                    echo "<td style='text-align: center'><strong>" . $bet . " ✓</strong></td>";
+                } else {
+                    echo "<td style='text-align: center'>" . $bet . " ✗</td>";
+                }
             }
 
         }
