@@ -18,6 +18,7 @@ require ("view.navbar.php");
 
 require ("config.php");
 require ("match.php");
+require ("bet.php");
 
 
 $seasonmenu = null;
@@ -144,7 +145,7 @@ if(count($md_matches) > 0){
 
 $statement = ("SELECT submitted FROM ".$db_name.".bet ");*/
 //!!!!! check if submitted
-if (true) {?>
+if (false) {?>
 <form action="<?php echo $actual_link; ?>" method="post">
 <table class="table"> // Tabelle fürs tippen!
     <thead class="thead-inverse">
@@ -214,14 +215,17 @@ else {
         echo "<td style='text-align: center' colspan='1'>" . gmdate('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
         echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
         echo "<td style='text-align: center' colspan='1'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  I  <strong>" . $row['winner'] . "</strong></td>";
+        $matchid = $row['id'];
 
         $statement = ("SELECT * FROM " . $db_name . ".user ");
         foreach ($pdo->query($statement) as $row) {
-            //!!!!!!Eingetragene Tipps
-            /*$stat2 = ("SELECT bet FROM ".$db_name.".bet WHERE match_id =" . $row['id'] ." AND user_id =" .$row['id']);
-            $bet = $pdo->query($stat2);
-    echo    "<th style='text-align: center' colspan='1'>" . $bet . "</th>";*/
-            echo "<th style='text-align: center' colspan='1'>" . $row['username'] . "</th>";
+            if (get_bet($row['id'],$matchid) == false){
+                echo "<th style='text-align: center' colspan='1'>-</th>";
+            } else {
+
+                echo "<th style='text-align: center' colspan='1'>" . get_bet($row['id'],$matchid) . "</th>";
+            }
+
         }
         echo "</tr>";
     }
