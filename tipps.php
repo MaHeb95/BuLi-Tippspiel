@@ -173,7 +173,7 @@ foreach ($md_matches AS $row) {
 
         <form action="<?php echo $actual_link; ?>" method="post">
             <label for="inputbet"></label>
-            <input type="number" class="form-control" name="inputbet" list="possibleBets" placeholder="" step="1" min="0" max="2" value="<?php echo $bet; ?>"
+            <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value="<?php echo $bet; ?>"
                 <?php if ($row['start'] < 0) {echo "disabled";}?>>
             <datalist id="possibleBets">
                 <option value="0">
