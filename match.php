@@ -235,8 +235,7 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
 function get_match_ids($matchday_id) {
     require("config.php");
 
-    $statement = $pdo->prepare("SELECT id FROM ".$db_name.".match WHERE matchday_id = :matchday_id
-         ORDER BY start_time ASC");
+    $statement = $pdo->prepare("SELECT id FROM ".$db_name.".match WHERE matchday_id = :matchday_id");
     $statement->bindValue(':matchday_id', $matchday_id, PDO::PARAM_INT);
     $statement->execute();
 
