@@ -223,7 +223,6 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
 
     //update points
     foreach(all_users() AS $user) {
-        var_dump($user['id']);
         check_points($user['id'],$match_id);
     }
 
@@ -341,5 +340,6 @@ function parse_soccer24($url) {
 
 //var_dump(get_matches(get_match_ids(1)));
 
+//var_dump(update_match(1));
 
 ?>

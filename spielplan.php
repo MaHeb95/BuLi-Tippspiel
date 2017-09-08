@@ -18,7 +18,9 @@ require ("view.navbar.php");
 
 require ("config.php");
 require ("match.php");
+require ("bet.php"); //for get_user only
 
+$is_admin = (bool) (get_user($userid)['admin']);
 
 $seasonmenu = null;
 $matchdaymenu = null;
@@ -37,9 +39,13 @@ $md_matches = null;
 if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
     foreach (get_match_ids($matchdaymenu) as $id) {
-        $match = $md_matches[$id];
-        if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
-            update_match($id);
+        if (isset($_POST['delete'.$id])) {
+            delete_match($id);
+        } else {
+            $match = $md_matches[$id];
+            if ((strtotime($match['start']) < 0) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
+                update_match($id);
+            }
         }
     }
     $md_matches = get_matches(get_match_ids($matchdaymenu));
@@ -140,13 +146,16 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 <?php
 if(count($md_matches) > 0){
     ?>
+<form action="<?php echo $actual_link; ?>" method="post">
 <table class="table">
     <thead class="thead-inverse">
     <tr>
         <th>Anstoss</th>
         <th style="text-align: center" colspan="3">Ansetzung</th>
         <th style="text-align: center">Ergebnis</th>
-        <!--<th>Action</th>-->
+        <?php if ($is_admin) { ?>
+        <th></th>
+        <?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -159,28 +168,63 @@ if(count($md_matches) > 0){
         echo "<td align='center'> - </td>";
         echo "<td>" . $row['guest_team'] . "</td>";
         echo "<td align='center'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "</td>";
-        //echo "<td></td>";
+        $match_id = $row['id'];
+        if ($is_admin) {
+            echo "<td><button type='submit' class='btn btn-primary' name='delete$match_id' value='1'>Löschen</button></td>";
+        }
         echo "</tr>";
     }
     echo "</tbody>";
     echo "</table>";
+    echo "</form>";
 }
 elseif(count($md_matches) == 0 && $md_matches !== null) {
     echo "<p class='lead'><em>Keine Spiele gefunden.</em></p>";
 }?>
 
 <?php
-if ($md_matches !== null) {
-    ?>
+if ($is_admin) {
+    if ($seasonmenu === null) {
+        ?>
 
-    <div class="container">
-        <form action="<?php echo $actual_link; ?>" method="post">
-            <label for="inputurl">Eingabe der Match URL</label>
-            <input type="text" class="form-control" name="inputurl" placeholder="URL" value="<?php echo $url; ?>">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-    <?php
+        <div class="container">
+            <form action="<?php echo $actual_link; ?>" method="post">
+                <label for="inputurl">Neue Saison</label>
+                <input type="text" class="form-control" name="new_season_name" placeholder="Saison Name"
+                       value="<?php echo $url; ?>">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <?php
+    }
+
+    if ($seasonmenu !== null AND $matchdaymenu === null) {
+        ?>
+
+        <div class="container">
+            <form action="<?php echo $actual_link; ?>" method="post">
+                <label for="inputurl">Neuer Spieltag</label>
+                <input type="text" class="form-control" name="new_matchday_name" placeholder="Spieltag Name"
+                       value="<?php echo $url; ?>">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <?php
+    }
+
+    if ($md_matches !== null) {
+        ?>
+
+        <div class="container">
+            <form action="<?php echo $actual_link; ?>" method="post">
+                <label for="inputurl">Neues Spiel</label>
+                <input type="text" class="form-control" name="inputurl" placeholder="Spiel URL"
+                       value="<?php echo $url; ?>">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <?php
+    }
 }
 ?>
 

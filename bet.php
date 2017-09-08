@@ -147,13 +147,20 @@ function sum_points_all($user_id) {
     return $points;
 }
 
+function get_user($user_id) {
+    require ("config.php");
+
+    $statement = $pdo->prepare("SELECT * FROM " . $db_name . ".user WHERE id = ".$user_id);
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+}
+
 function all_users() {
     require ("config.php");
 
     $statement = $pdo->prepare("SELECT * FROM " . $db_name . ".user ");
     $statement->execute();
-    $user = $statement->fetchAll();
-
+    $user = $statement->fetchAll(PDO::FETCH_ASSOC);
 
     return $user;
 }

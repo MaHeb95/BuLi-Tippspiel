@@ -10,7 +10,7 @@
 require ("view.nologin.php");
 
 //Abfrage der Nutzer ID vom Login
-$userid = $_SESSION['userid'];
+$userid = (int) $_SESSION['userid'];
 
 //Ausgabe des internen Startfensters
 require ("view.header.php");
@@ -35,7 +35,7 @@ if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
     foreach (get_match_ids($matchdaymenu) as $id) {
         $match = $md_matches[$id];
-        if ((strtotime($match['start_time']) < time()) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
+        if ((strtotime($match['start']) < 0) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
             update_match($id);
         }
     }
@@ -209,10 +209,13 @@ else {
         //echo "<td>" . $row['id'] . "</td>";
         echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($match['start_time'])) . "</td>";
         echo "<td style='text-align: center' colspan='3'>" . $match['home_team'] . " - " . $match['guest_team'] . "</td>";
-        echo "<td style='text-align: center' colspan='1'>" . $match['home_goals'] . " - " . $match['guest_goals'] . "  I  <strong>" . $match['winner'] . "</strong></td>";
+        if ($match['home_goals'] !== null) {
+            echo "<td style='text-align: center' colspan='1'>" . $match['home_goals'] . " - " . $match['guest_goals'] . "  |  <strong>" . $match['winner'] . "</strong></td>";
+        } else {
+            echo "<td style='text-align: center' colspan='1'></td>";
+        }
 
-        $statement = ("SELECT * FROM " . $db_name . ".user ");
-        foreach ($pdo->query($statement) as $user) {
+        foreach (all_users() as $user) {
             $bet = get_bet($user['id'],$match['id']);
             if ($bet === NULL){
                 echo "<td style='text-align: center'>-</td>";
@@ -231,17 +234,45 @@ else {
     }
     echo "<tr class='active' >";
     echo "<td style='text-align: end' colspan='5'>Punkte Spieltag:</td>";
-        $statement = ("SELECT * FROM " . $db_name . ".user ");
-        foreach ($pdo->query($statement) as $user) {
+        foreach (all_users() as $user) {
             echo "<td style='text-align: center'><strong>" . sum_points_matchday($user['id'],$matchdaymenu) . "</strong></td>";
         }
     echo "</tr>";
 
     echo "<tr class='active' >";
     echo "<td style='text-align: end' colspan='5'>Punkte Gesamt:</td>";
-    $statement = ("SELECT * FROM " . $db_name . ".user ");
-    foreach ($pdo->query($statement) as $user) {
+
+    $user_ids = [];
+    $total_points = [];
+    foreach (all_users() as $user) {
+        $user_ids[] = $user['id'];
+        $total_points[] = sum_points_all($user['id']);
         echo "<td style='text-align: center'><strong>" . sum_points_all($user['id']) . "</strong></td>";
+    }
+    echo "</tr>";
+
+    // sort user ID's and total points by points descending
+    array_multisort($total_points,SORT_DESC, $user_ids);
+
+    // calculate the ranking
+    $ranks = [];
+    $last_score = null;
+    $rows = 0;
+    foreach ($user_ids as $index => $id) {
+        $rows++;
+        if( $last_score !== $total_points[$index] ){
+            $last_score = $total_points[$index];
+            $rank = $rows;
+        }
+        $ranks[$id] = $rank;
+    }
+
+    // output the ranking
+    echo "<tr class='active' >";
+    echo "<td style='text-align: end' colspan='5'>Platz:</td>";
+
+    foreach ($user_ids as $id) {
+        echo "<td style='text-align: center'><strong>" . $ranks[$id] . "</strong></td>";
     }
     echo "</tr>";
 
