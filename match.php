@@ -168,7 +168,7 @@ function delete_match($match_id) {
 
 function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goals=NULL, $finished=NULL) {
     require("config.php");
-    require("bet.php");
+    require_once("bet.php");
 
     // get match information
     $statement = $pdo->prepare("SELECT * FROM ".$db_name.".match WHERE id = :id");

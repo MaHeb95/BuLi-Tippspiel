@@ -35,6 +35,14 @@ if (trim($_POST["inputurl"]) !== "") {
     create_match($matchdaymenu, trim($_POST["inputurl"]));
 }
 
+if (trim($_POST["new_season_name"]) !== "") {
+    create_season(trim($_POST["new_season_name"]));
+}
+
+if (trim($_POST["new_matchday_name"]) !== "") {
+    create_matchday($seasonmenu, trim($_POST["new_matchday_name"]));
+}
+
 $md_matches = null;
 if ($matchdaymenu !== null) {
     $md_matches = get_matches(get_match_ids($matchdaymenu));
@@ -43,7 +51,7 @@ if ($matchdaymenu !== null) {
             delete_match($id);
         } else {
             $match = $md_matches[$id];
-            if ((strtotime($match['start']) < 0) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
+            if (((int)$match['start'] < 0) && (!isset($match['home_goals']) || !isset($match['guest_goals']))) {
                 update_match($id);
             }
         }
