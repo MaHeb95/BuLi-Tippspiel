@@ -47,7 +47,8 @@ if ($matchdaymenu !== null) {
 
 
 ?>
-
+<html>
+<head>
     <script type="text/javascript">
         /**
          * You can have a look at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with * for more information on with() function.
@@ -120,7 +121,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                             <?php
                             //POPULATE DROP DOWN WITH Matchday FROM A GIVEN Season
                             foreach ($matchdays as $row) {
-                                echo ("<option value=\"{$row['id']}\" " . ($matchdaymenu == $row['id'] ? " selected" : "") . ">{$row['name']}</option>");
+                                echo ("<option value=\"{$row['id']}\" " . ($matchdaymenu == $row['id'] ? "selected" : "") . ">{$row['name']}</option>");
                             }
                             ?>
                         </select>
