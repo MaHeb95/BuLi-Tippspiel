@@ -276,7 +276,7 @@ else {
     foreach (all_users() as $user) {
         $user_ids[] = $user['id'];
         $total_points[] = sum_points_all($user['id']);
-        echo "<td style='text-align: center'><strong>" . sum_points_all($user['id']) . "</strong></td>";
+        echo "<td style='text-align: center'><strong>" . sum_points_all_at_matchday($user['id'],$matchdaymenu) . "</strong></td>";
     }
     echo "</tr>";
 
