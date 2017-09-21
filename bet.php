@@ -37,6 +37,27 @@ function create_bet($user_id, $match_id, $bet) {
     return $result;
 }
 
+function admin_bet($user_id, $match_id, $bet) {
+    require("config.php");
+
+    $statement = $pdo->prepare("SELECT * FROM ".$db_name.".bet WHERE match_id='".$match_id."' AND user_id=".$user_id);
+    $statement->execute();
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    if( ! $row)
+    {
+        $statement = $pdo->prepare("INSERT INTO ".$db_name.".bet (user_id, match_id, bet, time) VALUES (:user_id, :match_id, :bet, NOW())");
+        $statement->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $statement->bindValue(':match_id', $match_id, PDO::PARAM_INT);
+        $statement->bindValue(':bet', $bet, PDO::PARAM_INT);
+        $result = $statement->execute();
+    } else {
+        $statement = $pdo->prepare("UPDATE ".$db_name.".bet SET bet=:bet, time=NOW() WHERE match_id='".$match_id."' AND user_id='".$user_id."'");
+        $statement->bindValue(':bet', $bet, PDO::PARAM_INT);
+        $result = $statement->execute();
+    }
+    return $result;
+}
+
 function get_bet($user_id, $match_id) {
     require ("config.php");
 

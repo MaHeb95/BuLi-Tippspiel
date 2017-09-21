@@ -20,6 +20,7 @@ require ("config.php");
 require ("match.php");
 require ("bet.php");
 
+$is_admin = (bool) (get_user($userid)['admin']);
 
 $seasonmenu = null;
 $matchdaymenu = null;
@@ -87,6 +88,19 @@ foreach (all_users() AS $user) {
                     window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value;
                 } else {
                     window.location.href = 'tipps.php?season=' + season.options[season.selectedIndex].value + '&matchday=' + matchday.options[matchday.selectedIndex].value;
+                }
+            }
+        }
+        function to_tippsadmin()
+        {
+            with (window.document.form) {
+                /**
+                 * We have if and else block where we check the selected index for Seasonegory(season) and * accordingly we change the URL in the browser.
+                 */
+                if (matchday.selectedIndex === 0) {
+                    window.location.href = 'tippsadmin.php?season=' + season.options[season.selectedIndex].value;
+                } else {
+                    window.location.href = 'tippsadmin.php?season=' + season.options[season.selectedIndex].value + '&matchday=' + matchday.options[matchday.selectedIndex].value;
                 }
             }
         }
@@ -175,23 +189,30 @@ foreach ($md_matches AS $row) {
     echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
     echo "<td style='text-align: center' colspan='1'>" ?>
             <label for="<?php echo $row['id']; ?>"></label>
-            <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
-                <?php if ($row['start'] < 0) {echo "disabled";}?>>
-            <datalist id="possibleBets">
-                <option value="0">
-                <option value="1">
-                <option value="2">
-            </datalist>
-        <?php //!!! bet INPUT
-        "</td>";
+                <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
+                    <?php if ($row['start'] < 0) {echo "disabled";}?>>
+                        <datalist id="possibleBets">
+                            <option value="0">
+                            <option value="1">
+                            <option value="2">
+                        </datalist>
+                    <?php //!!! bet INPUT
+    echo "</td>";
     echo "</tr>";
 }
 echo "</tbody>";
 echo "</table>";
 echo "<div class='col-md-3 col-md-offset-9'>";
-echo "<button type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
+echo "<button onclick='confirmFunction()' type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
 echo "</div>";
 echo "</form>";
+
+?>  <script>
+    function confirmFunction() {
+        alert("Wollen Sie die Tipps endgültig abgeben?");
+    }
+</script>  <?php
+
 }
 else {
 ?>
@@ -285,12 +306,19 @@ else {
 
     echo "</tbody>";
     echo "</table>";
+
+    if ($is_admin) {
+        echo "<a href='http://$_SERVER[HTTP_HOST]/tippsadmin.php?season=$seasonmenu&matchday=$matchdaymenu'>Tipps nachtragen!</a>";
+    }
 }
 }
 elseif(count($md_matches) == 0 && $md_matches !== null) {
     echo "<p class='lead'><em>Keine Spiele gefunden.</em></p>";
-}?>
+}
 
+
+
+?>
 
 </body>
 </html>
