@@ -188,14 +188,10 @@ foreach ($md_matches AS $row) {
     echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
     echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
     echo "<td style='text-align: center' colspan='1'>" ?>
-            <label for="<?php echo $row['id']; ?>"></label>
+
+                <label for="<?php echo $row['id']; ?>"></label>
                 <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
                     <?php if ($row['start'] < 0) {echo "disabled";}?>>
-                        <datalist id="possibleBets">
-                            <option value="0">
-                            <option value="1">
-                            <option value="2">
-                        </datalist>
                     <?php //!!! bet INPUT
     echo "</td>";
     echo "</tr>";
