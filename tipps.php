@@ -304,7 +304,9 @@ else {
     echo "</table>";
 
     if ($is_admin) {
-        echo "<a href='http://$_SERVER[HTTP_HOST]/tippsadmin.php?season=$seasonmenu&matchday=$matchdaymenu'>Tipps nachtragen!</a>";
+        echo '&nbsp;&nbsp;&nbsp;';
+        echo "<a href='http://$_SERVER[HTTP_HOST]/tippsadmin.php?season=$seasonmenu&matchday=$matchdaymenu' class='btn btn-primary btn-lg active' role='button' aria-pressed='true'>Tipps nachtragen</a>
+";
     }
 }
 }
@@ -312,7 +314,8 @@ elseif(count($md_matches) == 0 && $md_matches !== null) {
     echo "<p class='lead'><em>Keine Spiele gefunden.</em></p>";
 }
 
-
+    echo '&nbsp;&nbsp;&nbsp;';
+    echo "<a href='http://$_SERVER[HTTP_HOST]/create_pdf.php?season=$seasonmenu&matchday=$matchdaymenu' class='btn btn-primary btn-lg active' role='button' aria-pressed='true'>Drucken</a>";
 
 ?>
 
