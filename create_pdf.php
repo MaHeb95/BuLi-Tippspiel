@@ -8,9 +8,6 @@
 
 include("fpdf.php");
 
-//Check Login
-require ("view.nologin.php");
-
 //Abfrage der Nutzer ID vom Login
 $userid = (int) $_SESSION['userid'];
 
