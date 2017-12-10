@@ -153,11 +153,14 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     echo "</tbody>";
     echo "</table>";
     echo "<div class='col-md-3 col-md-offset-9'>";
-    echo "<button onclick='confirmFunction()' type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
+    echo "<button onclick='confirmFunction()' type='submit' class='btn btn-primary btn-lg active' name='submit_bets' value='1'>Tipps abgeben!</button>";
     echo "</div>";
     echo "</form>";
 
-    echo "<a href='http://$_SERVER[HTTP_HOST]/tipps.php?season=$seasonmenu&matchday=$matchdaymenu'>Zurück zur Tippübersicht!</a>";
+    echo "<p></p>";
+
+    echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+    echo "<a href='http://$host_domain/tipps.php?season=$seasonmenu&matchday=$matchdaymenu' class='btn btn-primary btn-lg active' role='button' aria-pressed='true'>Zurück zur Tippübersicht!</a>";
     ?>
 
     <script>
