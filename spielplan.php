@@ -185,6 +185,10 @@ if(count($md_matches) > 0){
     echo "</tbody>";
     echo "</table>";
     echo "</form>";
+
+    echo '&nbsp;&nbsp;&nbsp;';
+    echo "<a href='http://$host_domain/create_pdf_spielplan.php?season=$seasonmenu&matchday=$matchdaymenu' class='btn btn-primary btn-lg active' role='button' aria-pressed='true'>Drucken</a>";
+
 }
 elseif(count($md_matches) == 0 && $md_matches !== null) {
     echo "<p class='lead'><em>Keine Spiele gefunden.</em></p>";

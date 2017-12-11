@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: mark
- * Date: 09.12.17
- * Time: 16:11
+ * Date: 11.12.17
+ * Time: 18:13
  */
 
 include("fpdf.php");
@@ -86,19 +86,7 @@ foreach ($md_matches AS $match) {
     foreach (all_users() as $user) {
         $pdf->SetFont('Arial','',12);
         $bet = get_bet($user['id'], $match['id']);
-        if ($bet === NULL) {
-            $pdf->Cell(18,10,'',1,0,C,0);
-        } else {
-            if ($match['winner'] === NULL) {
-                $pdf->Cell(18,10,$bet,1,0,C,0);
-            } elseif ($bet == $match['winner']) {
-                $pdf->SetFont('Arial','B',12);
-                $pdf->Cell(18,10,'  ' . $bet . ' *',1,0,C,0);
-            } else {
-                $pdf->Cell(18,10,$bet,1,0,C,0);
-            }
-        }
-
+        $pdf->Cell(18,10,'',1,0,C,0);
     }
     $pdf->Cell(1,10,'',1,1,C,0);
 }
@@ -108,7 +96,7 @@ $pdf->SetFont('Arial','B',12);
 $pdf->Cell(130,10,'Punkte Spieltag:',1,0,R,1);
 $pdf->Cell(1,10,'',1,0,C,1);
 foreach (all_users() as $user) {
-    $pdf->Cell(18,10,sum_points_matchday($user['id'],$matchdaymenu),1,0,C,1);
+    $pdf->Cell(18,10,'',1,0,C,1);
 }
 $pdf->Cell(1,10,'',1,1,C,0);
 
