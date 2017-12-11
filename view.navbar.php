@@ -1,7 +1,5 @@
 <!doctype html >
 <html lang = "en" >
-<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
 <link href="/css/navbar.css" rel="stylesheet">
 <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
