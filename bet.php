@@ -208,4 +208,3 @@ function all_users() {
 //var_dump(sum_points_all_at_matchday(1,3));
 //var_dump(all_users());
 ?>
-

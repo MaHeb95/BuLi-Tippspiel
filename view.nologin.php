@@ -1,10 +1,11 @@
-<?php
+﻿<?php
 /**
  * Created by PhpStorm.
  * User: mark
  * Date: 05.09.17
  * Time: 12:45
  */
+error_reporting(E_ERROR);
 session_start();
 if(!isset($_SESSION['userid'])) {
     require ("view.header.php");
