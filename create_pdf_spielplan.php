@@ -106,7 +106,7 @@ $pdf->Cell(130,10,'Punkte Gesamt:',1,0,R,1);
 $pdf->Cell(1,10,'',1,0,C,1);
 foreach (all_users() as $user) {
     $user_ids[] = $user['id'];
-    $total_points[] = sum_points_all($user['id']);
+    $total_points[] = sum_points_all_at_matchday($user['id'],$matchdaymenu);
     $pdf->Cell(18,10,sum_points_all_at_matchday($user['id'],$matchdaymenu),1,0,C,1);
 }
 $pdf->Cell(1,10,'',1,1,C,0);
