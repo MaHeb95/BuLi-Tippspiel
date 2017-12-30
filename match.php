@@ -132,13 +132,15 @@ function get_matchdays($ids) {
     return $matchdays;
 }
 
-function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL, $start_time=NULL) {
+function create_match($matchday_id, $url=NULL, $home_team=NULL, $home_logo=NULL, $guest_team=NULL, $guest_logo=NULL, $start_time=NULL) {
     require("config.php");
 
     if ($url !== NULL) {
         $match_info = parse_match_url($url);
         $home_team = $match_info['home_team'];
+        $home_logo = $match_info['home_logo'];
         $guest_team = $match_info['guest_team'];
+        $guest_logo = $match_info['guest_logo'];
         $start_time = $match_info['start_time'];
     }
 
@@ -152,8 +154,8 @@ function create_match($matchday_id, $url=NULL, $home_team=NULL, $guest_team=NULL
     }
 
     // write information to database
-    $statement = $pdo->prepare("INSERT INTO ".$db_name.".match (matchday_id, home_team, guest_team, start_time, url) VALUES (:matchday_id, :home_team, :guest_team, FROM_UNIXTIME(:start_time), :url)");
-    $result = $statement->execute(array('matchday_id' => $matchday_id, 'home_team' => $home_team, 'guest_team' => $guest_team, 'start_time' => $start_time, 'url' => $url));
+    $statement = $pdo->prepare("INSERT INTO ".$db_name.".match (matchday_id, home_team, home_logo, guest_team, guest_logo, start_time, url) VALUES (:matchday_id, :home_team, :home_logo, :guest_team, :guest_logo, FROM_UNIXTIME(:start_time), :url)");
+    $result = $statement->execute(array('matchday_id' => $matchday_id, 'home_team' => $home_team, 'home_logo' => $home_logo, 'guest_team' => $guest_team, 'guest_logo' => $guest_logo, 'start_time' => $start_time, 'url' => $url));
 
     return $result;
 }
@@ -166,7 +168,7 @@ function delete_match($match_id) {
     return $statement->execute();
 }
 
-function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goals=NULL, $finished=NULL) {
+function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goals=NULL, $finished=NULL, $home_logo=NULL, $guest_logo=NULL) {
     require("config.php");
     require_once("bet.php");
 
@@ -197,6 +199,12 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
                 $finished = $match['finished'];
             }
         }
+        if ($home_logo === NULL) {
+            $home_logo = $match_info['home_logo'];
+        }
+        if ($guest_logo === NULL) {
+            $guest_logo = $match_info['guest_logo'];
+        }
     }
 
     if ($finished) {
@@ -212,15 +220,16 @@ function update_match($match_id, $start_time=NULL, $home_goals=NULL, $guest_goal
     }
 
     $statement = $pdo->prepare("UPDATE ".$db_name.".match SET home_goals=:home_goals, guest_goals=:guest_goals, 
-        finished=:finished, winner=:winner, start_time=FROM_UNIXTIME(:start_time) WHERE id=:id");
+        finished=:finished, winner=:winner, start_time=FROM_UNIXTIME(:start_time), home_logo=:home_logo, guest_logo=:guest_logo WHERE id=:id");
     $statement->bindValue(':id', $match_id, PDO::PARAM_INT);
     $statement->bindValue(':home_goals', $home_goals, PDO::PARAM_INT);
     $statement->bindValue(':guest_goals', $guest_goals, PDO::PARAM_INT);
     $statement->bindValue(':finished', $finished, PDO::PARAM_BOOL);
     $statement->bindValue(':winner', $winner, PDO::PARAM_INT);
     $statement->bindValue(':start_time', $start_time, PDO::PARAM_INT);
+    $statement->bindValue(':home_logo', $home_logo, PDO::PARAM_STR);
+    $statement->bindValue(':guest_logo', $guest_logo, PDO::PARAM_STR);
     $result = $statement->execute();
-
     //update points
     foreach(all_users() AS $user) {
         check_points($user['id'],$match_id);
@@ -274,6 +283,8 @@ function parse_match_url($url) {
 function parse_soccer24($url) {
     $return = array();
 
+    $url_parsed = parse_url($url);
+
     $html = file_get_contents($url);
 
     libxml_use_internal_errors(TRUE); //disable libxml errors
@@ -287,6 +298,8 @@ function parse_soccer24($url) {
 
     $return['home_team'] = $xpath->query("//td[contains(@class, 'tname-home logo-enable')]/span[contains(@class, 'tname')]/a")[0]->nodeValue;
     $return['guest_team'] = $xpath->query("//td[contains(@class, 'tname-away logo-enable')]/span[contains(@class, 'tname')]/a")[0]->nodeValue;
+    $return['home_logo'] = $url_parsed["scheme"].'://'.$url_parsed["host"].$xpath->query("//td[contains(@class, 'tlogo-home')]/div/a/img")->item(0)->getAttribute('src');
+    $return['guest_logo'] = $url_parsed["scheme"].'://'.$url_parsed["host"].$xpath->query("//td[contains(@class, 'tlogo-away')]/div/a/img")->item(0)->getAttribute('src');
     $score = $xpath->query("//td[contains(@class, 'current-result')]/span[contains(concat(' ', @class, ' '), ' scoreboard ')]");
 
     if ($score->length) {

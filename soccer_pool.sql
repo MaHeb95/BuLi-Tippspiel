@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema soccer_pool
+-- Schema tippspiel
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema soccer_pool
+-- Schema tippspiel
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `soccer_pool` DEFAULT CHARACTER SET utf8 ;
-USE `soccer_pool` ;
+CREATE SCHEMA IF NOT EXISTS `tippspiel` DEFAULT CHARACTER SET utf8 ;
+USE `tippspiel` ;
 
 -- -----------------------------------------------------
--- Table `soccer_pool`.`user`
+-- Table `tippspiel`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `soccer_pool`.`user` (
+CREATE TABLE IF NOT EXISTS `tippspiel`.`user` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NULL,
@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS `soccer_pool`.`user` (
 
 
 -- -----------------------------------------------------
--- Table `soccer_pool`.`season`
+-- Table `tippspiel`.`season`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `soccer_pool`.`season` (
+CREATE TABLE IF NOT EXISTS `tippspiel`.`season` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `start_time` DATETIME NULL,
@@ -44,9 +44,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `soccer_pool`.`matchday`
+-- Table `tippspiel`.`matchday`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `soccer_pool`.`matchday` (
+CREATE TABLE IF NOT EXISTS `tippspiel`.`matchday` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `season_id` INT NOT NULL,
@@ -55,23 +55,25 @@ CREATE TABLE IF NOT EXISTS `soccer_pool`.`matchday` (
   INDEX `fk_matchday_season1_idx` (`season_id` ASC),
   CONSTRAINT `fk_matchday_season1`
     FOREIGN KEY (`season_id`)
-    REFERENCES `soccer_pool`.`season` (`id`)
+    REFERENCES `tippspiel`.`season` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `soccer_pool`.`match`
+-- Table `tippspiel`.`match`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `soccer_pool`.`match` (
+CREATE TABLE IF NOT EXISTS `tippspiel`.`match` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `matchday_id` INT NOT NULL,
   `url` VARCHAR(1023) NULL,
   `start_time` DATETIME NOT NULL,
   `finished` TINYINT(1) NOT NULL DEFAULT 0,
   `home_team` VARCHAR(255) NOT NULL,
+  `home_logo` VARCHAR(1023) NULL,
   `guest_team` VARCHAR(255) NOT NULL,
+  `guest_logo` VARCHAR(1023) NULL,
   `home_goals` INT NULL,
   `guest_goals` INT NULL,
   `winner` INT NULL,
@@ -79,16 +81,16 @@ CREATE TABLE IF NOT EXISTS `soccer_pool`.`match` (
   INDEX `fk_match_matchday_idx` (`matchday_id` ASC),
   CONSTRAINT `fk_match_matchday`
     FOREIGN KEY (`matchday_id`)
-    REFERENCES `soccer_pool`.`matchday` (`id`)
+    REFERENCES `tippspiel`.`matchday` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `soccer_pool`.`bet`
+-- Table `tippspiel`.`bet`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `soccer_pool`.`bet` (
+CREATE TABLE IF NOT EXISTS `tippspiel`.`bet` (
   `user_id` INT NOT NULL,
   `match_id` INT NOT NULL,
   `bet` VARCHAR(45) NULL,
@@ -100,17 +102,12 @@ CREATE TABLE IF NOT EXISTS `soccer_pool`.`bet` (
   INDEX `fk_bet_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_bet_match1`
     FOREIGN KEY (`match_id`)
-    REFERENCES `soccer_pool`.`match` (`id`)
+    REFERENCES `tippspiel`.`match` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_bet_user1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `soccer_pool`.`user` (`id`)
+    REFERENCES `tippspiel`.`user` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

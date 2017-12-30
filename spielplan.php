@@ -172,7 +172,7 @@ if(count($md_matches) > 0){
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
         echo "<td>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
-        echo "<td align='right'>" . $row['home_team'] . "</td>";
+        echo "<td align='right' background=''>" . $row['home_team'] . "</td>";
         echo "<td align='center'> - </td>";
         echo "<td>" . $row['guest_team'] . "</td>";
         echo "<td align='center'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "</td>";
@@ -186,8 +186,20 @@ if(count($md_matches) > 0){
     echo "</table>";
     echo "</form>";
 
+
+    echo "<form action='$actual_link' method='post'>";
     echo '&nbsp;&nbsp;&nbsp;';
     echo "<a href='http://$host_domain/create_pdf_spielplan.php?season=$seasonmenu&matchday=$matchdaymenu' class='btn btn-primary btn-lg active' role='button' aria-pressed='true'>Drucken</a>";
+    if($is_admin) {
+        echo '&nbsp;&nbsp;&nbsp;';
+        echo "<button type='submit' value='Update' name='update' class='btn btn-primary btn-lg active'>Update</button>";
+    }
+    echo "</form>";
+    if (isset($_POST['update'])) {
+        foreach (get_match_ids($matchdaymenu) as $id) {
+            update_match($id);
+        }
+    }
 
 }
 elseif(count($md_matches) == 0 && $md_matches !== null) {
@@ -239,7 +251,6 @@ if ($is_admin) {
     }
 }
 ?>
-
 
 </body>
 </html>
