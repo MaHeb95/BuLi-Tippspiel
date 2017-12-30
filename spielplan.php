@@ -101,13 +101,13 @@ if ($matchdaymenu !== null) {
 $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 ?>
 
-<form class="form" id="form" name="form" method="get" action="<?php echo $actual_link; ?>">
+<form class="form selector" id="form" name="form" method="get" action="<?php echo $actual_link; ?>">
     <fieldset>
         <div class="container">
             <div class="row justify-content-md-center">
                 <div class="col col-lg-3">
                     <p class="bg">
-                        <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
+                        <!-- <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
                         <!--onChange event fired and function autoSubmit() is invoked-->
                         <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
                         <option value="">-- Wähle eine Saison --</option>
@@ -129,7 +129,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                         ?>
                 <div class="col col-lg-3">
                     <p class="bg">
-                        <label for="matchday">Wähle einen Spieltag</label>
+                        <!-- <label for="matchday">Wähle einen Spieltag</label> -->
                         <select class="form-control" id="matchday" name="matchday" onchange="autoSubmit_matchday();">
                             <option value="">-- Wähle einen Spieltag --</option>
                             <?php
@@ -150,7 +150,6 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     </fieldset>
 </form>
 
-
 <?php
 if(count($md_matches) > 0){
     ?>
@@ -159,8 +158,8 @@ if(count($md_matches) > 0){
     <thead class="thead-inverse">
     <tr>
         <th>Anstoss</th>
-        <th style="text-align: center" colspan="3">Ansetzung</th>
-        <th style="text-align: center">Ergebnis</th>
+        <th>Ansetzung</th>
+        <th>Ergebnis</th>
         <?php if ($is_admin) { ?>
         <th></th>
         <?php } ?>
@@ -172,9 +171,19 @@ if(count($md_matches) > 0){
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
         echo "<td>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
-        echo "<td align='right' background=''>" . $row['home_team'] . "</td>";
-        echo "<td align='center'> - </td>";
-        echo "<td>" . $row['guest_team'] . "</td>";
+        echo "<style>
+            #id".$row['id'].".ansetzung:before {
+                background-image: url(". $row['home_logo'] .");
+            }
+      
+            #id".$row['id'].".ansetzung:after {
+                background-image: url(". $row['guest_logo'] .");
+            }
+            </style>";
+        echo "<td id='id".$row['id']."' class='ansetzung'>
+                <div class='ansetzung-text'>". $row['home_team'] . " - " . $row['guest_team'] . "</div>
+              </td>";
+
         echo "<td align='center'>" . $row['home_goals'] . " - " . $row['guest_goals'] . "</td>";
         $match_id = $row['id'];
         if ($is_admin) {

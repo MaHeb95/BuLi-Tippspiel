@@ -111,13 +111,13 @@ foreach (all_users() AS $user) {
 $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 ?>
 
-<form class="form" id="form" name="form" method="get" action="<?php echo $actual_link; ?>">
+<form class="form selector" id="form" name="form" method="get" action="<?php echo $actual_link; ?>">
     <fieldset>
         <div class="container">
             <div class="row justify-content-md-center">
                 <div class="col col-lg-3">
                     <p class="bg">
-                        <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
+                        <!-- <label for="season">Wähle eine Saison</label> <!-- Season SELECTION -->
                         <!--onChange event fired and function autoSubmit() is invoked-->
                         <select class="form-control" id="season" name="season" onchange="autoSubmit_season();">
                             <option value="">-- Wähle eine Saison --</option>
@@ -139,7 +139,7 @@ $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                         ?>
                         <div class="col col-lg-3">
                             <p class="bg">
-                                <label for="matchday">Wähle einen Spieltag</label>
+                                <!-- <label for="matchday">Wähle einen Spieltag</label> -->
                                 <select class="form-control" id="matchday" name="matchday" onchange="autoSubmit_matchday();">
                                     <option value="">-- Wähle einen Spieltag --</option>
                                     <?php
@@ -166,44 +166,57 @@ if(count($md_matches) > 0){
 
 if (check_matchday_submitted($userid,$matchdaymenu) !== TRUE) {?>
 <form action="<?php echo $actual_link; ?>" method="post">
-<table class="table">
-    <thead class="thead-inverse">
-    <tr>
-        <th style="text-align: center" colspan="1">Anstoss</th>
-        <th style="text-align: center" colspan="3">Ansetzung</th>
-        <?php
-        $statement = $pdo->prepare("SELECT username FROM " . $db_name . ".user WHERE id =" . $userid);
-        $statement->execute();
-        $user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
-        //var_dump($user);
-        echo "<th style='text-align: center'>" . $user . "</th>";
-        ?>
-</tr>
-</thead>
-<tbody>
-<?php
-foreach ($md_matches AS $row) {
-    echo "<tr>";
-    //echo "<td>" . $row['id'] . "</td>";
-    echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
-    echo "<td style='text-align: center' colspan='3'>" . $row['home_team'] . " - " . $row['guest_team'] . "</td>";
-    echo "<td style='text-align: center' colspan='1'>" ?>
+    <div class="table-responsive">
+        <table class="table tippabgabe">
+            <thead class="thead-inverse">
+                <tr>
+                    <th class="hidden-xs-down">Anstoss</th>
+                    <th>Ansetzung</th>
+                    <?php
+                    $statement = $pdo->prepare("SELECT username FROM " . $db_name . ".user WHERE id =" . $userid);
+                    $statement->execute();
+                    $user = $statement->fetch(PDO::FETCH_ASSOC)['username'];
+                    echo "<th>" . $user . "</th>";
+                    ?>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($md_matches AS $row) {
+                echo "<tr>";
+                //echo "<td>" . $row['id'] . "</td>";
+                echo "<td class='anstoss hidden-xs-down'>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
+                echo "<style>
+                        #id".$row['id'].".ansetzung:before {
+                            background-image: url(". $row['home_logo'] .");
+                        }
+                  
+                        #id".$row['id'].".ansetzung:after {
+                            background-image: url(". $row['guest_logo'] .");
+                        }
+                        </style>";
+                echo "<td id='id".$row['id']."' class='ansetzung'>
+                            <div class='ansetzung-text'>". $row['home_team'] . " - " . $row['guest_team'] . "</div>
+                          </td>";
+                echo "<td>" ?>
 
-                <label for="<?php echo $row['id']; ?>"></label>
-                <input type="number" class="form-control" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
+                <input type="number" class="form-control tippfeld" name="<?php echo $row['id']; ?>" list="possibleBets" placeholder="" step="1" min="0" max="2" value=""
                     <?php if ($row['start'] < 0) {echo "disabled";}?>>
                     <?php //!!! bet INPUT
-    echo "</td>";
-    echo "</tr>";
-}
-echo "</tbody>";
-echo "</table>";
-echo "<div class='col-md-3 col-md-offset-9'>";
-echo "<button onclick='confirmFunction()' type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
-echo "</div>";
+                echo "</td>";
+                echo "</tr>";
+            }
+            echo "</tbody>";
+        echo "</table>";
+    echo "</div>";
+    echo "<div class='col-md-3 col-md-offset-9'>";
+        echo "<button onclick='confirmFunction()' type='submit' class='btn btn-primary' name='submit_bets' value='1'>Tipps abgeben!</button>";
+    echo "</div>";
 echo "</form>";
 
-?>  <script>
+?>
+
+<script>
     function confirmFunction() {
         alert("Wollen Sie die Tipps endgültig abgeben?");
     }
@@ -212,45 +225,56 @@ echo "</form>";
 }
 else {
 ?>
-
+<div class="table-responsive">
 <table class="table">
     <thead class="thead-inverse">
     <tr>
-        <th style="text-align: center" colspan="1">Anstoss</th>
-        <th style="text-align: center" colspan="3">Ansetzung</th>
-        <th style="text-align: center" colspan="1">Ergebnis</th>
+        <th>Anstoss</th>
+        <th>Ansetzung</th>
+        <th>Ergebnis</th>
         <?php
         $statement = ("SELECT * FROM " . $db_name . ".user ");
         foreach (all_users() as $row) {
-            echo "<th style='text-align: center' colspan='1'>" . $row['username'] . "</th>";
+            echo "<th>" . $row['username'] . "</th>";
         }
         ?>
     </tr>
     </thead>
     <tbody>
     <?php
-    foreach ($md_matches AS $match) {
+    foreach ($md_matches AS $row) {
         echo "<tr>";
         //echo "<td>" . $row['id'] . "</td>";
-        echo "<td style='text-align: center' colspan='1'>" . date('d.m.Y - H:i', strtotime($match['start_time'])) . "</td>";
-        echo "<td style='text-align: center' colspan='3'>" . $match['home_team'] . " - " . $match['guest_team'] . "</td>";
+        echo "<td>" . date('d.m.Y - H:i', strtotime($row['start_time'])) . "</td>";
+        echo "<style>
+            #id".$row['id'].".ansetzung:before {
+                background-image: url(". $row['home_logo'] .");
+            }
+      
+            #id".$row['id'].".ansetzung:after {
+                background-image: url(". $row['guest_logo'] .");
+            }
+            </style>";
+        echo "<td id='id".$row['id']."' class='ansetzung'>
+                <div class='ansetzung-text'>". $row['home_team'] . " - " . $row['guest_team'] . "</div>
+              </td>";
         if ($match['home_goals'] !== null) {
-            echo "<td style='text-align: center' colspan='1'>" . $match['home_goals'] . " - " . $match['guest_goals'] . "  |  <strong>" . $match['winner'] . "</strong></td>";
+            echo "<td>" . $row['home_goals'] . " - " . $row['guest_goals'] . "  |  <strong>" . $row['winner'] . "</strong></td>";
         } else {
-            echo "<td style='text-align: center' colspan='1'></td>";
+            echo "<td></td>";
         }
 
         foreach (all_users() as $user) {
-            $bet = get_bet($user['id'],$match['id']);
+            $bet = get_bet($user['id'],$row['id']);
             if ($bet === NULL){
-                echo "<td style='text-align: center'>-</td>";
+                echo "<td>-</td>";
             } else {
-                if ($match['winner'] === NULL) {
-                    echo "<td style='text-align: center'>" . $bet . "</td>";
-                } elseif ($bet == $match['winner']) {
-                    echo "<td style='text-align: center'><strong>" . $bet . " ✓</strong></td>";
+                if ($row['winner'] === NULL) {
+                    echo "<td>" . $bet . "</td>";
+                } elseif ($bet == $row['winner']) {
+                    echo "<td><strong>" . $bet . " ✓</strong></td>";
                 } else {
-                    echo "<td style='text-align: center'>" . $bet . "</td>";
+                    echo "<td>" . $bet . "</td>";
                 }
             }
 
@@ -258,21 +282,21 @@ else {
         echo "</tr>";
     }
     echo "<tr class='active' >";
-    echo "<td style='text-align: end' colspan='5'>Punkte Spieltag:</td>";
+    echo "<td class='summary' colspan='3'>Punkte Spieltag:</td>";
         foreach (all_users() as $user) {
-            echo "<td style='text-align: center'><strong>" . sum_points_matchday($user['id'],$matchdaymenu) . "</strong></td>";
+            echo "<td><strong>" . sum_points_matchday($user['id'],$matchdaymenu) . "</strong></td>";
         }
     echo "</tr>";
 
     echo "<tr class='active' >";
-    echo "<td style='text-align: end' colspan='5'>Punkte Gesamt:</td>";
+    echo "<td class='summary' colspan='3'>Punkte Gesamt:</td>";
 
     $user_ids = [];
     $total_points = [];
     foreach (all_users() as $user) {
         $user_ids[] = $user['id'];
         $total_points[] = sum_points_all_at_matchday($user['id'],$matchdaymenu);
-        echo "<td style='text-align: center'><strong>" . sum_points_all_at_matchday($user['id'],$matchdaymenu) . "</strong></td>";
+        echo "<td><strong>" . sum_points_all_at_matchday($user['id'],$matchdaymenu) . "</strong></td>";
     }
     echo "</tr>";
 
@@ -293,15 +317,16 @@ else {
 
     // output the ranking
     echo "<tr class='active' >";
-    echo "<td style='text-align: end' colspan='5'>Platz:</td>";
+    echo "<td class='summary' colspan='3'>Platz:</td>";
 
     foreach (all_users() as $user) {
-        echo "<td style='text-align: center'><strong>" . $ranks[$user['id']] . "</strong></td>";
+        echo "<td><strong>" . $ranks[$user['id']] . "</strong></td>";
     }
     echo "</tr>";
 
     echo "</tbody>";
     echo "</table>";
+    echo "</div>";
 
     if ($is_admin) {
         echo '&nbsp;&nbsp;&nbsp;';
