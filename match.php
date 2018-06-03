@@ -275,7 +275,7 @@ function parse_match_url($url) {
         return parse_soccer24($url);
     }
     if (strpos($url, 'flashscore.de/spiel/') !== false) {
-        return parse_soccer24($url);
+        return parse_flashscore($url);
     }
     return NULL;
 }
@@ -302,6 +302,8 @@ function parse_soccer24($url) {
     $return['guest_logo'] = $url_parsed["scheme"].'://'.$url_parsed["host"].$xpath->query("//td[contains(@class, 'tlogo-away')]/div/a/img")->item(0)->getAttribute('src');
     $score = $xpath->query("//td[contains(@class, 'current-result')]/span[contains(concat(' ', @class, ' '), ' scoreboard ')]");
 
+    var_dump($xpath);
+
     if ($score->length) {
         $return['home_goals'] = $score[0]->nodeValue;
         $return['guest_goals'] = $score[1]->nodeValue;
@@ -309,6 +311,57 @@ function parse_soccer24($url) {
         $return['home_goals'] = NULL;
         $return['guest_goals'] = NULL;
     }
+
+    $var = $doc->getElementsByTagName('script')[7]->nodeValue;
+
+    foreach(preg_split("/((\r?\n)|(\r\n?))/", $var) as $line){
+        if (strpos($line, 'var game_utime ') !== false) {
+            $return['start_time'] = (int)explode(';', explode(' = ', trim($line))[1])[0];
+        }
+        if (strpos($line, 'var event_stage_type_id ') !== false) {
+            $status = (int)explode(';', explode(' = ', trim($line))[1])[0];
+            if ($status == 3) {
+                $return['finished'] = true;
+            } else {
+                $return['finished'] = false;
+            }
+        }
+    }
+
+    return $return;
+}
+
+function parse_flashscore($url) {
+    $return = array();
+
+    $url_parsed = parse_url($url);
+
+    $html = file_get_contents($url);
+
+    libxml_use_internal_errors(TRUE); //disable libxml errors
+
+    $doc = new DOMDocument();
+    $doc->loadHTML($html);
+
+    libxml_clear_errors(); //remove errors for yucky html
+
+    $xpath = new DOMXPath($doc);
+
+    $return['home_team'] = $xpath->query("//div[contains(@class, 'team-text tname-home')]/div/div/a")[0]->nodeValue;
+    $return['guest_team'] = $xpath->query("//div[contains(@class, 'team-text tname-away')]/div/div/a")[0]->nodeValue;
+    $return['home_logo'] = $url_parsed["scheme"].'://'.$url_parsed["host"].$xpath->query("//div[contains(@class, 'tlogo-home')]/div/a/img")->item(0)->getAttribute('src');
+    $return['guest_logo'] = $url_parsed["scheme"].'://'.$url_parsed["host"].$xpath->query("//div[contains(@class, 'tlogo-away')]/div/a/img")->item(0)->getAttribute('src');
+    $scorehome = $xpath->query("//div[contains(@class, 'current-result')]/span[contains(@class, 'ft')]/span[contains(concat(' ', @class, ' '), ' scoreboard ')]")[0]->nodeValue;
+    $scoreguest = $xpath->query("//div[contains(@class, 'current-result')]/span[contains(@class, 'ft')]/span/span[contains(concat(' ', @class, ' '), ' scoreboard ')]")[0]->nodeValue;
+    
+
+    if($scorehome==NULL) {
+        $scorehome = $xpath->query("//div[contains(@class, 'current-result')]/span[contains(concat(' ', @class, ' '), ' scoreboard ')]")[0]->nodeValue;
+        $scoreguest = $xpath->query("//div[contains(@class, 'current-result')]/span/span[contains(concat(' ', @class, ' '), ' scoreboard ')]")[0]->nodeValue;
+    }
+
+    $return['home_goals'] = $scorehome;
+    $return['guest_goals'] = $scoreguest;
 
     $var = $doc->getElementsByTagName('script')[7]->nodeValue;
 
